@@ -28,9 +28,14 @@ If any file is missing, log to GAPS.md and halt.
   comms-principles.md               L1-global/comms-principles.md
   user-segments.md                  L1-global/user-segments.md
   regulatory-compliance.md          L1-global/regulatory-compliance.md
+  data-sources.md                   L1-global/data-sources.md
 
 Note: regulatory-compliance.md is referenced by SECURITY-RULES.md Rule 2.
 If this file is missing, flag to human before proceeding with any task.
+
+Note: data-sources.md is used by measurement-agent.md Job B (construct).
+If this file is missing, measurement agent can still run Job A (analyse)
+but cannot construct SQL queries.
 
 ---
 

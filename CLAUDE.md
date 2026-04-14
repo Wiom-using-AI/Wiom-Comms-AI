@@ -131,6 +131,31 @@ treat them differently before loading the orchestrator.
 
 ---
 
+## HUMAN INPUT — USE INTERACTIVE OPTIONS
+
+When you need a decision, clarification, or approval from the human,
+always use the AskUserQuestion tool to present options as clickable
+choices. Never ask open-ended questions in plain text when structured
+options are possible.
+
+Use this for:
+  - Missing context: "Which audience segment?" with segment options
+  - Ambiguous tasks: "Which OS trigger applies?" with trigger options
+  - Design decisions: "Which channel?" with channel options
+  - Approval gates: "Approve this output?" with approve/reject/revise
+  - Conflict resolution: "Brief says X, dashboard says Y — which?"
+
+Rules:
+  - 2-4 options per question. Keep labels short (1-5 words).
+  - Add a description to each option explaining the implication.
+  - The human can always type a custom answer (built-in "Other" option).
+  - If multiple independent decisions are needed, ask up to 4 questions
+    in a single prompt rather than asking one at a time.
+  - Never guess when you can ask. A 5-second popup is better than
+    a wrong design that needs rework.
+
+---
+
 ## WHAT AGENTS CAN AND CANNOT DO
 
   CAN:
@@ -163,7 +188,30 @@ treat them differently before loading the orchestrator.
 
 ---
 
+## LIVE DATA SOURCES
+
+For active campaigns with live dashboards, the agent should WebFetch
+the dashboard URL before any design, measurement, or iteration task
+to get current metrics. Static context files capture stable facts;
+dashboards capture volatile numbers.
+
+  project-csp-migration-apr26:
+    Dashboard: https://shivakimothi-design.github.io/csp-comms-dashboard/
+    Contains : real-time popup reach, video completion, quiz pass rates,
+               deployment statuses, campaign timeline, partner state
+               distribution (S0-S4)
+    When     : before any task on project-csp-migration-apr26 that
+               needs current metrics (design, measurement, iteration)
+    Fallback : if dashboard is unreachable, use the snapshot in
+               L3-projects/project-csp-migration-apr26/results.md
+
+---
+
 ## LAST UPDATED
+2026-04-13 — v1.2
+  + Live Data Sources section added for CSP migration dashboard
+  + L3 project files created for project-csp-migration-apr26:
+    context-from-teams.md, comms-log.md, results.md, iterations.md
 2026-03-27 — v1.1
   + OS-level domain routing (replaces journey-based)
   + PCA files added to L1 (pca-content-governance, pca-enforcement-governance)

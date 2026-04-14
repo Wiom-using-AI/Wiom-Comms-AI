@@ -23,7 +23,18 @@ Load this file when:
 6. Write output to review-queue/ — never anywhere else
 
 ## LAST UPDATED
-2026-03-27 — initial version
+2026-04-13 — v1.1 — Recipient-centric message design:
+  + Message Type Classification step (Type A/B/C) added to Mode 1 and Mode 2
+  + Recipient Analysis step added (questions, hesitations, operational details)
+  + Information Architecture guidance added to Draft step
+    (State Architecture, Operational Architecture, Hybrid)
+  + Friction Audit step added (post-draft, pre-self-check)
+  + OUTPUT FORMAT updated with Recipient Analysis and Information
+    Architecture sections
+  + GUARDRAILS updated with operational detail and context-before-ask rules
+  + WHAT GOOD OUTPUT LOOKS LIKE updated with recipient-centric criteria
+  + Step numbers shifted: Mode 1 now Steps 1–9, Mode 2 now Steps 1–8
+2026-03-27 — v1.0 — initial version
 Maintained by: human only
 
 ---
@@ -120,15 +131,167 @@ Read these directly from the handoff block:
       Agent script    : no hard character limit, but check readability
                         at speaking pace — aim for <90 seconds per section
 
-  Step 4 — Draft
+  Step 4 — Classify the message type
+
+    Before drafting, classify this message as one of three types.
+    The classification determines the message architecture in Step 6.
+
+    TYPE A — STATE COMMUNICATION
+      The message translates a structural state change.
+      Examples: SLA state moved to At Risk, bonus eligibility paused,
+      routing exposure adjusted, enforcement action initiated.
+      Signal: the trigger is an OS state machine event.
+      → Use State Message Architecture in Step 6.
+
+    TYPE B — OPERATIONAL / LOGISTICS COMMUNICATION
+      The message communicates an operational event that requires
+      CSP awareness or physical action, but is not a structural
+      state change.
+      Examples: device installation, system maintenance at location,
+      process change requiring CSP preparation, new tool rollout,
+      asset swap or upgrade, infrastructure work at CSP site.
+      Signal: the trigger is an operational deployment or process,
+      not an OS state machine event.
+      → Use Operational Message Architecture in Step 6.
+
+    TYPE C — HYBRID
+      The message involves both a state change AND an operational
+      action. Example: SLA state moved to Non-Compliant AND
+      mandatory enablement requires scheduling a visit.
+      → Lead with State Architecture for the state change,
+        then transition into Operational Architecture for the
+        action-required portion.
+
+    Note the classification in the output. It affects the entire
+    message structure.
+
+  Step 5 — Recipient analysis
+
+    Before drafting, complete this analysis. It is mandatory for
+    all message types but especially critical for Type B and C.
+
+    a. Questions that block action
+       What must the CSP understand before they can take the
+       next step? List only questions whose answers are
+       prerequisites for the requested action. Do not list
+       every possible question — only those that, if left
+       unanswered, would prevent the CSP from acting.
+       This aligns with PCA Principle 2: information, not persuasion.
+       Include only what the CSP cannot get from the dashboard
+       or pull channels (comms-principles P3).
+
+    b. Hesitations that block action
+       What concrete friction points might stop the CSP from
+       taking the requested step? Focus on:
+         - Cost concern (who pays for this?)
+         - Time/disruption concern (how long, will it affect service?)
+         - Singling-out concern (why me, is this targeted?)
+         - Loss of control concern (what changes at my location?)
+         - Ongoing obligation concern (what must I maintain after?)
+       List only friction points that would genuinely prevent action.
+       Do not over-address — the goal is to remove barriers, not
+       to reassure. This aligns with PCA Principle 7: dignity
+       without indulgence — clarity, not comfort.
+
+    c. Operational details needed for action
+       What specific facts does the CSP need to complete the
+       requested action? Examples:
+         - Duration (how long will it take?)
+         - Preparation (what must be ready — space, power, access?)
+         - Who does what (who comes, who initiates contact?)
+         - Cost (who bears cost, is there any CSP expense?)
+         - What happens after (ongoing obligations, maintenance?)
+       Every detail must trace to an operational fact (PCA Principle 1:
+       structure first). If any detail is not in the brief, handoff
+       block, or context-from-teams: ask the human before drafting.
+       Do not guess. Do not omit.
+
+    Record the recipient analysis in the output (see OUTPUT FORMAT).
+
+  Step 6 — Draft
 
     For task_type = design (new comm):
-      Write the message copy from scratch using:
-        - Objective from brief.md or handoff block
-        - Proven patterns from OS playbook
-        - PCA vocabulary and tone
-        - Channel formatting rules
-        - Audience language and register
+
+      First: select the message architecture based on Step 4
+      classification.
+
+      ── STATE MESSAGE ARCHITECTURE (Type A) ─────────────────────
+
+        Use this for structural state changes. The existing pattern
+        is correct for these messages:
+          1. State change — what changed, in canonical vocabulary
+          2. Consequence — what this means structurally (routing,
+             bonus, enablement)
+          3. Next action — what the CSP should do (if anything)
+          4. Pull reference — where to see details (dashboard link)
+
+        Apply:
+          - Proven patterns from OS playbook
+          - PCA vocabulary and tone
+          - Channel formatting rules
+          - Audience language and register
+
+      ── OPERATIONAL MESSAGE ARCHITECTURE (Type B) ───────────────
+
+        Use this for operational/logistics communications.
+        The message must follow this flow:
+
+          1. CONTEXT — Why this is happening.
+             One paragraph, factual, framed in terms of what it
+             means for service or connections. System as subject
+             (PCA Principle 5: impersonal authority).
+             Example: "To detect and resolve connection issues
+             faster, the Wiom system is installing a monitoring
+             device at CSP locations."
+
+          2. RELEVANCE — What this means for the CSP's service
+             or their connections.
+             One paragraph connecting the operational change to
+             something the CSP cares about. Factual, not
+             motivational. No upside narrative (PCA §11).
+             Example: "This will allow faster detection and
+             resolution of network issues, so connections
+             receive more stable service."
+
+          3. HOW IT WORKS — Operational details with embedded
+             friction reduction.
+             Answer the key questions from Step 5a here. Address
+             the friction points from Step 5b by embedding the
+             answers naturally — do not create a separate
+             "reassurance" section.
+             Include: who does what, how long it takes, what the
+             CSP needs to prepare, who bears any cost, what
+             happens after.
+             Use a clear label: "कैसे होगा?" / "How will this work?"
+
+          4. WHAT TO DO — Clear action steps.
+             Specific, ordered steps the CSP must take. Use a
+             clear label: "आपको क्या करना है?" / "What you need to do:"
+             Each step is one concrete action.
+             Include preparation requirements (space, power, access).
+             Include ongoing obligations if any (keep device on,
+             do not disconnect).
+
+          5. NORMALISATION — One closing line confirming this is
+             standard, not targeted.
+             Example: "This setup is being done at all CSP locations
+             as part of the Wiom system process."
+             This aligns with PCA Principle 8: no alternate
+             interpretations. Every CSP gets the same framing.
+
+        Apply throughout:
+          - PCA vocabulary and tone (Neutral-Professional)
+          - Channel formatting rules and character limits
+          - Audience language and register
+          - No persuasion, no motivation, no warmth beyond dignity
+
+      ── HYBRID ARCHITECTURE (Type C) ────────────────────────────
+
+        Lead with State Message Architecture for the state change
+        portion. Then transition into Operational Architecture
+        (from RELEVANCE onward) for the action-required portion.
+        The state change provides the context; the operational
+        section provides the how and what-to-do.
 
     For task_type = iterate (improve existing):
       Read the existing message from comms-log.md or PRIOR_CONTEXT
@@ -144,7 +307,32 @@ Read these directly from the handoff block:
       Include a stopping rule — what ends the sequence
         (partner recharged / partner replied / sequence completes)
 
-  Step 5 — Self-check before writing output
+  Step 7 — Friction audit
+
+    After drafting, re-read the message as if you are the CSP.
+    At each sentence, ask: would I stop here, hesitate, or feel
+    uneasy? For each friction point identified:
+
+      → Is it already addressed in the message? If yes: pass.
+      → If not: add a line that addresses it. Keep it factual.
+        Do not add reassurance — add information.
+
+    Check specifically:
+      □ Cost: is it clear who pays for any cost involved?
+      □ Time: is it clear how long any disruption or activity takes?
+      □ Targeting: is it clear this is standard, not punitive?
+      □ Control: is it clear what changes at the CSP's location?
+      □ Obligations: is it clear what the CSP must maintain after?
+
+    Normalisation check:
+      □ Does the message make clear this is a system-wide process,
+        not targeted at one CSP? If the action applies broadly,
+        a normalisation line must be present.
+
+    If friction audit adds content: re-check against channel
+    character limits before proceeding.
+
+  Step 8 — Self-check before writing output
 
     Run QUALITY-CHECKLIST.md Section 2 (design outputs) in full.
     Run SECURITY-RULES.md Rule 5 self-check in full.
@@ -160,7 +348,7 @@ Read these directly from the handoff block:
     If any quality or security item fails: fix it now, then re-check.
     Do not write output until both checklists pass.
 
-  Step 6 — Write output
+  Step 9 — Write output
 
     Write to: review-queue/[project_id]/[YYYY-MM-DD]-[objective-slug].md
     For one-off tasks: review-queue/adhoc/[YYYY-MM-DD]-[objective-slug].md
@@ -244,22 +432,47 @@ Extract these from the request. Ask if any critical parameter is missing.
     No L3 — no project folder in standalone mode.
     PRIOR_CONTEXT from the request replaces the comms-log check.
 
-  Step 3 — Draft
+  Step 3 — Classify the message type
 
-    Same as Mode 1 Step 4 above.
+    Same as Mode 1 Step 4. Classify as Type A (state), Type B
+    (operational/logistics), or Type C (hybrid). The classification
+    determines message architecture in Step 5.
+
+  Step 4 — Recipient analysis
+
+    Same as Mode 1 Step 5. Complete the three-part analysis:
+      a. Questions that block action
+      b. Hesitations that block action
+      c. Operational details needed for action
+    If operational details are missing from the request: ask the
+    human before drafting. Do not guess or omit.
+
+  Step 5 — Draft
+
+    Same as Mode 1 Step 6.
+    Select message architecture based on Step 3 classification:
+      Type A → State Message Architecture
+      Type B → Operational Message Architecture
+      Type C → Hybrid Architecture
     Apply PCA vocabulary and tone from L1 global files.
     Apply channel constraints from channel-specs.md.
     Apply OS playbook patterns if available.
     If OS playbook not available: apply general PCA principles only.
     Note in output which context was and was not available.
 
-  Step 4 — Self-check
+  Step 6 — Friction audit
 
-    Same as Mode 1 Step 5 above.
+    Same as Mode 1 Step 7. Re-read as the CSP. Check for cost,
+    time, targeting, control, and obligation friction points.
+    Add normalisation line if the action applies broadly.
+
+  Step 7 — Self-check
+
+    Same as Mode 1 Step 8.
     Run QUALITY-CHECKLIST.md Section 2 in full.
     Run SECURITY-RULES.md Rule 5 self-check in full.
 
-  Step 5 — Write output
+  Step 8 — Write output
 
     Write to: review-queue/adhoc/[YYYY-MM-DD]-[objective-slug].md
     Follow OUTPUT FORMAT exactly (see below).
@@ -297,6 +510,26 @@ Character count        : [X characters — within / exceeds [channel] limit]
 ## Audience
 [Segment description — geography, recipient type, status,
  language register, relevant behavioural signals.]
+
+## Recipient analysis
+Message type        : [Type A — State / Type B — Operational / Type C — Hybrid]
+Questions that block action:
+  [List only questions the CSP must have answered before they can act.
+   Each question followed by where it is answered in the message.]
+Hesitations that block action:
+  [List friction points and how each is addressed in the copy.
+   Format: friction point → how addressed → which paragraph.]
+Operational details for action:
+  [List each specific detail the CSP needs to complete the
+   requested step. Note source: brief / handoff / human-confirmed.]
+
+## Information architecture
+Flow: [Context → Relevance → How → Action → Normalisation
+       — or State → Consequence → Action → Pull reference
+       — or Hybrid: State → Consequence → Relevance → How → Action → Normalisation]
+Mapping:
+  [Map each flow section to the specific paragraph(s) in the message.
+   Example: Context = paragraph 1, How = paragraph 3 ("कैसे होगा?" section)]
 
 ## Objective
 [The specific behaviour this message is designed to drive.
@@ -377,6 +610,14 @@ SECURITY CHECK  : [PASS / FLAG: rule number — issue — what human needs to do
     Do not pretend L2 was loaded. Work from PCA and L1 only.
   → If any PCA test fails: rewrite before outputting.
     Do not flag a known PCA failure and output anyway.
+  → Never draft an operational/logistics message (Type B or C) without
+    completing the Recipient Analysis step first.
+  → Never produce a message that jumps to action without establishing
+    context first. Context before ask — always.
+  → If operational details (duration, cost, preparation, who does what)
+    are unknown: ask the human before drafting. Do not guess or omit.
+  → Never over-answer: the message addresses only what the CSP needs
+    to take the next step, not every possible question.
 
 ---
 
@@ -392,6 +633,11 @@ A complete design output:
   - Passes all 8 PCA anti-contamination tests
   - Ends with QUALITY CHECK: PASS and SECURITY CHECK: PASS
     (or FLAG lines that tell the human exactly what to resolve)
+  - Answers the questions the CSP needs answered before they can act
+  - Addresses friction points that would prevent the next step
+  - Includes all operational details needed for the requested action
+  - Follows a clear information architecture (context before ask)
+  - Includes normalisation where the action applies broadly
 
 A complete design output does NOT:
   - Contain any subscription or monthly ISP framing
@@ -399,3 +645,10 @@ A complete design output does NOT:
   - Have a measurement plan without a data source
   - Skip the PCA compliance section
   - Go directly to any channel without review-queue
+  - Jump straight to action without context
+  - Leave action-blocking questions unanswered
+  - Ignore friction points that would prevent the CSP from acting
+  - Produce a generic "inform + CTA" message when operational
+    detail is available
+  - Over-answer: the message is not an FAQ — it addresses only
+    what the CSP needs to take the next step

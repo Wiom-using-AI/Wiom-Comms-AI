@@ -266,6 +266,321 @@ monthly plan language. SECURITY-RULES.md Rule 1 applies in full.
 
 ---
 
-*OUTPUT-TEMPLATES.md — L0 Agent Instructions — v1.0*
+## TEMPLATE 2 — MEASUREMENT REPORT
+
+Use when: task_type = measure
+Output location: review-queue/[project-id]/[YYYY-MM-DD]-measurement-[cycle-or-slug].md
+  or for one-off: review-queue/adhoc/[YYYY-MM-DD]-measurement.md
+
+---
+
+```
+# MEASUREMENT REPORT
+Status: PENDING HUMAN REVIEW
+
+---
+
+## HEADER
+
+Date              : [YYYY-MM-DD]
+Project ID        : [project_id from MANIFEST.md — or "adhoc"]
+Measurement cycle : [cycle identifier — e.g. "Cycle 1: 05/04–10/04"]
+Measured comms    : [which messages — e.g. "Contextual popups + Blocker video"]
+Measured by       : [Claude — agent session]
+Data sources      : [results.md snapshot date + live dashboard fetch timestamp
+                     — or "results.md only"]
+
+---
+
+## SECTION 1 — MEASUREMENT SCOPE
+
+Period             : [start date — end date]
+Stage              : [pre-launch / launch day / post-launch / ongoing]
+Comms measured     : [list each comm with its message ref and channel]
+Audience           : [segment and size]
+Benchmarks used    : [brief.md targets / context-from-teams.md thresholds /
+                      playbook benchmarks — list which]
+
+---
+
+## SECTION 2 — PERFORMANCE SUMMARY
+
+[Table format. One row per metric. All four columns mandatory.]
+
+  METRIC                    VALUE          TARGET         STATUS
+  -------------------------------------------------------------------------
+  [metric name]             [actual]       [benchmark]    [GREEN/YELLOW/RED/BASELINE]
+  [metric name]             [actual]       [benchmark]    [GREEN/YELLOW/RED/BASELINE]
+
+---
+
+## SECTION 3 — WHAT WORKED
+
+[For each GREEN metric: one paragraph explaining what contributed
+to the success. Be specific — was it the mechanism, timing, targeting,
+copy, or channel? This feeds the learning agent.]
+
+---
+
+## SECTION 4 — WHAT DIDN'T WORK
+
+[For each RED or YELLOW metric:]
+
+  Finding          : [specific metric that missed target]
+  Value vs Target  : [X% actual vs Y% target — STATUS]
+  Root cause       : [hypothesis for why — must be specific and
+                      evidence-backed, not generic]
+  Evidence         : [what data supports this hypothesis]
+  Confidence       : [high / medium / low]
+
+---
+
+## SECTION 5 — RECOMMENDATIONS
+
+[For each finding in Section 4:]
+
+  Finding ref      : [which finding from Section 4]
+  Action           : [ITERATE / SCALE / PAUSE / FLAG]
+  Specifics        : [exactly what to do — concrete enough for the
+                      design agent or human to act on directly]
+  Expected impact  : [what improvement this should produce — be honest
+                      about uncertainty]
+
+---
+
+## SECTION 6 — COMPARISON
+
+[How these results compare to:]
+  Brief.md targets           : [summary — on track / behind / ahead]
+  Context-from-teams thresholds : [GREEN / YELLOW / RED overall]
+  L2 playbook benchmarks     : [if available — or "no playbook benchmarks
+                                exist for this OS yet"]
+  Prior measurement cycles   : [if this is Cycle 2+, compare to Cycle 1]
+
+---
+
+## SECTION 7 — DATA LIMITATIONS
+
+[Mandatory. Even if data is clean, note:]
+  Sample size      : [adequate / limited — and why]
+  Time window      : [sufficient / early — and why]
+  Missing metrics  : [which metrics could not be measured and why]
+  Confounds        : [anything else happening that could explain results]
+  Blocked metrics  : [metrics that cannot be measured due to product
+                      dependencies not being live]
+
+---
+
+## QUALITY CHECK
+
+[Run QUALITY-CHECKLIST.md §4 before writing this line.]
+
+QUALITY CHECK: PASS — all §4 items verified.
+
+  — or —
+
+QUALITY CHECK: FLAG
+[item number] — [what the issue is] — [what the human needs to do]
+
+---
+
+## SECURITY CHECK
+
+[Run SECURITY-RULES.md self-check in full.]
+
+SECURITY CHECK: PASS — all six rule areas checked, no violations.
+
+  — or —
+
+SECURITY CHECK: FLAG — [rule number] — [issue] — [action required]
+
+---
+
+Status: PENDING HUMAN REVIEW
+Next step: human reviews findings and recommendations, then decides
+whether to iterate (hand back to design agent), scale, pause, or
+investigate blockers.
+If iterating: create a new design task referencing this report.
+If findings are significant: learning agent should review for
+cross-project pattern extraction.
+```
+
+---
+
+## FIELD NOTES FOR THE MEASUREMENT AGENT
+
+### On data sources
+Always state which data you used and when it was collected. If you
+WebFetched a live dashboard, note the fetch timestamp separately
+from the results.md snapshot date. If numbers differ between the
+two sources, use the newer numbers but note the delta.
+
+### On root causes
+"Low completion rate" is a finding, not a root cause. A root cause
+hypothesis must explain WHY the rate is low. "66% of viewers drop off
+within the first 20 seconds, suggesting the video opening does not
+establish relevance fast enough" is a root cause hypothesis.
+
+### On recommendations
+Every recommendation must be concrete enough for someone to act on
+without reading the full report. "Iterate on the video" is not
+actionable. "Shorten the video to under 60 seconds, front-load
+earnings information (currently delayed until 1:10)" is actionable.
+
+### On GREEN findings
+Do not skip what worked. The learning agent needs GREEN findings
+to extract proven patterns. A GREEN finding with a clear attribution
+("popup reach was 86.3% because the mechanism was organic and
+dismissible, reducing friction") is high-value learning material.
+
+---
+
+## TEMPLATE 3 — MEASUREMENT SETUP (SQL + Instructions)
+
+Use when: task_type = construct-measurement
+Output location: review-queue/[project-id]/[YYYY-MM-DD]-measurement-setup-[slug].md
+  or for one-off: review-queue/adhoc/[YYYY-MM-DD]-measurement-setup.md
+
+---
+
+```
+# MEASUREMENT SETUP
+Status: PENDING HUMAN EXECUTION
+
+---
+
+## HEADER
+
+Date              : [YYYY-MM-DD]
+Project ID        : [project_id — or "adhoc"]
+Source brief       : [which comms design brief this tracks —
+                      e.g. "2026-04-02-d0-app-live-welcome.md"]
+Constructed by    : [Claude — agent session]
+
+---
+
+## SECTION 1 — MEASUREMENT PLAN (from brief)
+
+[Copy the measurement plan from the source brief Section 6]
+
+  Primary metric      : [what to measure]
+  Target              : [success threshold]
+  Measurement window  : [when to check]
+  Data source         : [where the data lives]
+  Secondary metric    : [if any]
+
+---
+
+## SECTION 2 — QUERIES
+
+### Query 1: [metric name]
+
+  Metabase question name : [suggested name]
+  Collection             : [suggested collection path]
+  Visualisation          : [line / number / table / bar]
+  Exposed filters        : [which date filters the human can adjust]
+
+```sql
+-- ═══════════════════════════════════════════════
+-- METRIC: [metric name]
+-- COMM: [message ref]
+-- TARGET: [target]
+-- WINDOW: [measurement window]
+-- ═══════════════════════════════════════════════
+
+[Complete, ready-to-paste SQL query]
+;
+```
+
+### Query 2: [metric name]
+
+[Same structure as Query 1. Repeat for each metric.]
+
+---
+
+## SECTION 3 — CLEVERTAP EVENTS (if applicable)
+
+[For metrics that live in CleverTap, not Snowflake:]
+
+  Event name          : [e.g. blocker_video_completed]
+  Filter              : [e.g. quiz_score >= 4]
+  How to check        : [CleverTap dashboard path or export instruction]
+  Note                : [whether this event is synced to Snowflake or not]
+
+---
+
+## SECTION 4 — METABASE SETUP INSTRUCTIONS
+
+[Step-by-step for the human:]
+
+  1. Go to [collection path] in Metabase
+  2. Click New > SQL Query
+  3. Paste Query 1 above
+  4. Save as "[suggested name]"
+  5. Set visualisation to [type]
+  6. [Optional] Set up alert: "[condition — e.g. if daily PTL
+     calls exceed 2x baseline, send email"]
+  7. Repeat for each query
+
+---
+
+## SECTION 5 — MEASUREMENT CHECKLIST
+
+[Dated checklist the human follows:]
+
+  DATE               CHECK                         QUERY       THRESHOLD
+  -----------------------------------------------------------------------
+  [deploy + 24hrs]   [first metric read]           [query 1]   [GREEN/YELLOW/RED values]
+  [deploy + 48hrs]   [target window reached]        [query 1]   [target value]
+  [deploy + 7days]   [full cycle review]            [all]       [overall assessment]
+
+  Action triggers:
+    GREEN  : no action needed, log result in results.md
+    YELLOW : review with team, consider iteration
+    RED    : escalate, trigger measurement agent Job A for full analysis
+
+---
+
+## SECTION 6 — LIMITATIONS
+
+[What this setup cannot measure:]
+  - [e.g. "Video watch time not available in Snowflake — requires
+    CleverTap export or manual check"]
+  - [e.g. "PTL call content not captured — only volume, not topic"]
+
+---
+
+Status: PENDING HUMAN EXECUTION
+Next step: human creates the queries in Metabase, runs the first
+check at [deploy + 24hrs], and logs results in results.md.
+After first measurement cycle: run measurement agent Job A to
+analyse the data.
+```
+
+---
+
+## FIELD NOTES FOR MEASUREMENT SETUP
+
+### On query parameterisation
+Always leave dates as editable comments in the SQL. The human will
+adjust the measurement window as the campaign progresses. Never
+hardcode dates without a comment explaining what to change.
+
+### On CleverTap gaps
+Many comms metrics (especially behavioural events like popup_seen,
+video_completed, quiz_passed) live in CleverTap, not Snowflake.
+If the event is not synced to Snowflake, do not pretend you can
+query it. State clearly what lives where and provide the CleverTap
+event spec so the human can check manually or set up an export.
+
+### On PTL measurement
+PTL call volume is the primary success metric for CSP migration.
+Always include a baseline query (7-day average before the comm
+was sent) alongside the post-comm query. The spike is relative
+to baseline, not absolute.
+
+---
+
+*OUTPUT-TEMPLATES.md — L0 Agent Instructions — v1.2*
 *Maintained by: human only*
 *Do not modify without updating CHANGELOG.md*
