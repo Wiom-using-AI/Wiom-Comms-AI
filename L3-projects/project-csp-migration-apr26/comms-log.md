@@ -11,8 +11,23 @@ agent appends to it after every deployment.
   entries into the Historical Summary section below.
 - Every entry must use the standard format.
 - STATUS must be one of: pending / approved / deployed / measured
+- PLANNED vs DEPLOYED: Every entry must clearly indicate whether it is
+  planned (STATUS: pending / approved) or actually deployed
+  (STATUS: deployed). Logger agent always asks before writing.
+- Plan becomes reality: When a planned entry is actually deployed,
+  do NOT edit the original. Write a NEW entry for the deployment
+  with a LINKED_PLAN field referencing the plan entry number.
+  Append a single closing line to the plan entry:
+  "→ See Entry N for actual deployment on [date]". Add a row to
+  iterations.md documenting the plan-to-reality delta.
 
 ## LAST UPDATED
+2026-04-15 (pm) — Entry 6 appended: Recap + Quiz deployment on 15/04
+             (evolved from planned Entry 4). Entry 4 annotated with
+             closing line pointing to Entry 6. RULES section extended
+             with planned-vs-deployed clause and plan-to-reality
+             transition rule. iterations.md Iteration 3 added in same
+             commit.
 2026-04-15 — Previous Entry 1 (M6 pending design) removed per human
              instruction (was a design draft, never deployed; tracked in
              review-queue). Remaining entries renumbered. Entries 1, 2, 3
@@ -141,6 +156,7 @@ No historical entries yet. All entries are within the rolling window.
   NOTES          : Quiz is the education verification gate. Target:
                    >70% pass rate of attempts. Not yet deployed as of
                    13/04.
+                   → See Entry 6 for actual deployment on 2026-04-15.
 
 ---
 
@@ -159,6 +175,60 @@ No historical entries yet. All entries are within the rolling window.
   STATUS         : pending
   NOTES          : This is the hard cutover. Partners below S2 cannot
                    proceed without completing education.
+
+---
+
+### Entry 6
+
+  DATE           : 2026-04-15
+  TYPE           : deploy
+  CHANNEL        : In-App (blocker popup → video + recap → quiz)
+  MESSAGE_REF    : Pre-launch — Recap + Quiz (actual deployment)
+  LINKED_PLAN    : Entry 4
+  APP_VERSION    : Current (old) partner app — pre-transition
+  AUDIENCE       : Active OWNERs + ADMINs
+  AUDIENCE_SIZE  : ~1,400
+  TRIGGER        : Blocker popup appears on "New Tasks" screen.
+                   Non-dismissible until quiz passed.
+  SUMMARY        : Full-screen blocker. Header:
+                   "ज़रूरी अपडेट — आगे बढ़ने से पहले यह जानना ज़रूरी है।"
+                   Video embedded at top. Below video: 3-point recap
+                   (Bonus ₹120 / NetBox ₹50 / 15-day carry fee rule).
+                   CTA "प्रश्नों का जवाब दें" appears only after partner
+                   watches video for 15 seconds. Clicking CTA starts an
+                   8-question quiz.
+  VIDEO_GATE     : 15 seconds of video watch required before quiz CTA
+                   appears.
+  RECAP_BULLETS  : "Bonus ₹120 तक — internet quality पर निर्भर"
+                   "NetBox collect करने पर ₹50"
+                   "15 दिन बाद NetBox idle हो तो ₹2/दिन carry fee"
+  QUIZ_LENGTH    : 8 questions (Hindi/Hinglish)
+  QUIZ_TOPICS    : Q1 commission (₹300 fixed, on recharge + installation);
+                   Q2 bonus driver (good internet quality);
+                   Q3 internet quality definition (uptime + ISP speed);
+                   Q4 measurement mechanism (PNM device in partner office,
+                   always ON);
+                   Q5 NetBox collection fee (₹50 per collected NetBox);
+                   Q6 NetBox carry fee (no charge for 15 days, then
+                   ₹2/day);
+                   Q7 PayG customer model (customer recharges as needed,
+                   not monthly);
+                   Q8 new app contents (NetBox rules, rate card, updates —
+                   one-stop destination).
+  PASS_LOGIC     : Must answer ALL 8 correctly. Wrong answer on any
+                   question → quiz restarts from Q1. No partial pass.
+                   No skip.
+  METRICS        : Pending — first day of deployment. See results.md
+                   for updates.
+  DESIGNED_BY    : Campaign team (not via Comms AI pipeline)
+  STATUS         : deployed
+  NOTES          : Stricter than planned Entry 4: 8Q vs 5Q, all-correct
+                   vs 4/5 pass, restart-on-wrong added, 15-sec video
+                   gate added. See iterations.md Iteration 3 for full
+                   plan→reality delta. Full quiz copy captured in
+                   Iteration 3. CleverTap event name: to be confirmed
+                   with campaign team (expected: quiz_started /
+                   quiz_completed).
 
 ---
 

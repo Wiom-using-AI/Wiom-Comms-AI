@@ -11,6 +11,10 @@ from the message itself or from a change made partway through.
 - Include A/B test results where available.
 
 ## LAST UPDATED
+2026-04-15 — Iteration 3 added: Recap + Quiz deployed 15/04. Captures
+             plan-to-reality delta (5Q→8Q, 4/5→all correct, restart-on-
+             wrong added, 15-sec video gate added). Also logs full quiz
+             copy for reference.
 2026-04-13 — initial version documenting plan-to-execution evolution.
 Maintained by: design agent proposes, human confirms.
 
@@ -91,6 +95,99 @@ Maintained by: design agent proposes, human confirms.
 
   RESULT:
   Pending. WA push impact and quiz deployment still to be measured.
+
+---
+
+## Iteration 3 — Recap + Quiz Deployed, Evolved from Plan (2026-04-15)
+
+  WHAT CHANGED:
+  1. Recap + Quiz deployed on 15/04 (was planned for 08/04 in brief,
+     then held TBD as of Iteration 2). Deployed 7 days behind original
+     plan.
+  2. Quiz length: 5 questions → 8 questions (+3 questions).
+  3. Pass threshold: 4 out of 5 correct → ALL 8 must be correct.
+  4. Wrong-answer behaviour: (not specified in plan) → any wrong answer
+     restarts quiz from Q1. No partial pass. No skip.
+  5. Video gate before quiz CTA: (not specified in plan) → partner must
+     watch the embedded video for at least 15 seconds before the
+     "प्रश्नों का जवाब दें" CTA appears.
+  6. Delivery structure: Plain quiz → blocker popup containing video +
+     3-point recap bullets (Bonus ₹120 / NetBox ₹50 / carry fee rule)
+     above the quiz CTA. Header: "ज़रूरी अपडेट".
+  7. Trigger context: Popup shown on "New Tasks" screen — blocks the
+     partner's task-taking workflow until quiz is passed.
+
+  WHY IT CHANGED:
+  1. Date shifts — app launch and campaign timeline moved repeatedly
+     (see Iteration 2). Quiz held back to align with operational
+     readiness and to incorporate observations from earlier
+     deployments.
+  2. Learnings from previous quiz deployments — design evolved toward
+     stricter retention testing. Reference to specific prior quizzes
+     TBD; to be confirmed with campaign team and linked into this
+     iteration when identified.
+  [Reasons captured from Shiva on 2026-04-15 — to be enriched by
+   campaign team with data references.]
+
+  HYPOTHESIS:
+  Forcing retention (not just exposure) via strict all-correct quiz
+  with restart will produce better actual understanding of the PayG
+  economic model than a lenient 4/5 gate, even at the cost of higher
+  friction and longer time-to-pass. The 15-second video gate ensures
+  minimum forced exposure before any quiz attempt.
+
+  RESULT:
+  Pending. First day of deployment 15/04. Measure in 3-5 days.
+  Key metrics to watch:
+    - Quiz attempt rate (of eligible partners, ~1,400 base)
+    - Median attempts to pass
+    - Time-to-pass distribution
+    - Partners stuck (e.g. >5 attempts without passing)
+    - Drop-off at video gate vs drop-off during quiz
+    - Which specific questions cause the most wrong answers (topic
+      weakness signal)
+
+  FULL QUIZ COPY (captured for measurement + learning reference):
+
+    Q1: हर connection के recharge पर आपको कितना commission मिलेगा?
+        A) ₹300 fixed, installation पर भी  ✅
+        B) Wiom हर महीने decide करेगा कितना देना है
+        C) Commission नहीं, सिर्फ़ bonus मिलेगा
+
+    Q2: ज़्यादा Bonus पाने के लिए क्या करना होगा?
+        A) अपनी internet quality अच्छी रखनी होगी  ✅
+        B) Wiom office जाकर request करना होगा
+        C) ज़्यादा से ज़्यादा phone calls करने होंगे
+
+    Q3: Internet quality का मतलब क्या है?
+        A) सारे connections बिना रुके चलें (uptime) और सही ISP speed आए  ✅
+        B) Customer को ज़्यादा से ज़्यादा data मिले
+        C) WiFi का range बढ़ाना
+
+    Q4: Internet quality measure करने के लिए क्या होगा?
+        A) आपके office में PNM device लगेगा, जो हमेशा ON रखना है  ✅
+        B) हर हफ़्ते Wiom की team आकर check करेगी
+        C) Customer खुद app पर rating देगा
+
+    Q5: Customer से NetBox collect करने पर क्या मिलेगा?
+        A) ₹50, हर collected NetBox पर  ✅
+        B) कुछ नहीं, यह अलग से paid नहीं है
+        C) NetBox का पैसा साल के end में मिलेगा
+
+    Q6: NetBox collect करने के बाद carry fee कब से लगेगी?
+        A) 15 दिन बाद से — ₹2 प्रति दिन  ✅
+        B) पहले दिन से ही लगेगी
+        C) Carry fee जैसा कुछ नहीं है
+
+    Q7: नए system में customer का internet कैसे चलेगा?
+        A) Customer जितने दिन चाहे उतने दिन का recharge करेगा  ✅
+        B) Wiom khud se customer का plan renew करेगा
+        C) Wiom automatically सबको internet देगा, recharge की ज़रूरत नहीं
+
+    Q8: नए app पर क्या-क्या होगा?
+        A) NetBox rules, updated rate card — सब एक जगह  ✅
+        B) सिर्फ़ Wiom का phone number
+        C) सिर्फ़ पुराने bills की list
 
 ---
 
