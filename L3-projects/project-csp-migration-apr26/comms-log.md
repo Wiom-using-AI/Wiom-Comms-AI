@@ -13,6 +13,12 @@ agent appends to it after every deployment.
 - STATUS must be one of: pending / approved / deployed / measured
 
 ## LAST UPDATED
+2026-04-15 — Previous Entry 1 (M6 pending design) removed per human
+             instruction (was a design draft, never deployed; tracked in
+             review-queue). Remaining entries renumbered. Entries 1, 2, 3
+             (contextual popup, blocker video, WA nudge) enriched in place
+             with actual deployed content. Append-only rule waived per
+             explicit human instruction on 2026-04-15.
 2026-04-13 — initial version populated from CSP Comms Dashboard.
 Maintained by: logger agent writes, human spot-checks.
 
@@ -28,49 +34,44 @@ No historical entries yet. All entries are within the rolling window.
 
 ### Entry 1
 
-  DATE           : 2026-04-02
-  TYPE           : design
-  CHANNEL        : WhatsApp Utility
-  MESSAGE_REF    : M6 (D0: App is Live, Your State is Ready)
-  AUDIENCE       : Active CSPs (~1,200)
-  AUDIENCE_SIZE  : ~1,200
-  SUMMARY        : App download/update instructions. Dashboard is ready.
-                   Single CTA: download new app, check dashboard.
-                   Hindi-primary. Trust Line fallback.
-  METRICS        : N/A — designed but deployment pending product
-                   confirmation of dashboard readiness
-  DESIGNED_BY    : Claude — agent session
-  STATUS         : pending
-  NOTES          : Output in review-queue/project-csp-migration-apr26/
-                   2026-04-02-d0-app-live-welcome.md.
-                   Designed from L1 globals only (onboarding playbook
-                   not yet created). QUALITY CHECK: FLAG (2.4 playbook
-                   pending). SECURITY CHECK: PASS.
+  DATE           : 2026-04-05
+  TYPE           : deploy
+  CHANNEL        : In-App (contextual popup)
+  MESSAGE_REF    : Pre-launch — Contextual Popups (2 variants)
+  AUDIENCE       : Active OWNERs + ADMINs
+  AUDIENCE_SIZE  : ~1,400
+  SUMMARY        : Two one-time mandatory contextual popups on Wallet
+                   and Service Ticket screens. Partners who see these
+                   move from S0 to S1. Dismiss only on "Theek hai" click.
+
+  POPUP_A        : Wallet / Earnings screen
+    TRIGGER      : Shown on first landing on Wallet / Earnings section
+    INTENT       : Educate on "up to ₹120 per connection based on
+                   internet quality" going live 5th April
+    COPY_HEADER  : "Bonus – ₹120 तक Internet quality के हिसाब से"
+    CTA          : "Theek hai" (mandatory click to dismiss)
+
+  POPUP_B        : Service Ticket full view
+    TRIGGER      : Shown on first full view of a service ticket when
+                   partner is about to assign it
+    INTENT       : Educate on "keep your internet quality good" going
+                   live 5th April
+    COPY_HEADER  : "Keep your Internet quality well"
+    CTA          : "Theek hai" (mandatory click to dismiss)
+
+  METRICS        : Popup reach: 86.3% (1,046 of 1,212 partners as of
+                   10/04). Combined metric for both variants under
+                   CleverTap event contextual_popup_seen. See
+                   results.md for full metrics.
+  DESIGNED_BY    : Campaign team (not via Comms AI pipeline)
+  STATUS         : deployed
+  NOTES          : First education touchpoint. Designed outside the
+                   Comms AI pipeline. Copy enriched 2026-04-15 from
+                   campaign team brief + deployed screenshots.
 
 ---
 
 ### Entry 2
-
-  DATE           : 2026-04-05
-  TYPE           : deploy
-  CHANNEL        : In-App (contextual popup)
-  MESSAGE_REF    : Pre-launch — Contextual Popups
-  AUDIENCE       : Active OWNERs + ADMINs
-  AUDIENCE_SIZE  : ~1,400
-  SUMMARY        : Dismissible contextual popups on Wallet and Tickets
-                   screens. Organic discovery mechanism. Partners who
-                   see these move from S0 to S1.
-  METRICS        : Popup reach: 86.3% (1,046 of 1,212 partners as of
-                   10/04). See results.md for full metrics.
-  DESIGNED_BY    : Campaign team (not via Comms AI pipeline)
-  STATUS         : deployed
-  NOTES          : First education touchpoint. Designed outside the
-                   Comms AI pipeline. CleverTap event:
-                   contextual_popup_seen.
-
----
-
-### Entry 3
 
   DATE           : 2026-04-07 (night)
   TYPE           : deploy
@@ -82,6 +83,8 @@ No historical entries yet. All entries are within the rolling window.
                    10 sec. Covers connection assignment, PayG, earnings,
                    NetBox, carry fee, timeline. Partners who complete
                    move from S1 to S2.
+  CREATIVE_FILE  : Wiom_System_Updates_v2.mp4 (source file held by
+                   campaign team; not archived in repo)
   METRICS        : Video starters: 1,054. 80%+ watch: 29.5% (311).
                    Full completion: 18.9% (199). Median watch time:
                    35 seconds. 66% drop-off by 20 seconds.
@@ -92,10 +95,11 @@ No historical entries yet. All entries are within the rolling window.
                    mechanism (non-dismissible). Low completion rate is
                    a key concern. CleverTap event:
                    blocker_video_completed. Deployed night of 07/04.
+                   Creative filename logged 2026-04-15.
 
 ---
 
-### Entry 4
+### Entry 3
 
   DATE           : 2026-04-09
   TYPE           : deploy
@@ -103,17 +107,24 @@ No historical entries yet. All entries are within the rolling window.
   MESSAGE_REF    : Pre-launch — WA Push (non-completers)
   AUDIENCE       : Partners at S0 or S1 (did not complete blocker video)
   AUDIENCE_SIZE  : TBD — targeted to non-completers only
-  SUMMARY        : WhatsApp message to partners who have not completed
-                   the blocker video. Redirects them back to blocker.
-                   Targeted, not blasted to all.
+  SUMMARY        : Short Hindi WhatsApp nudge redirecting non-completers
+                   back to the blocker video via deep link. Targeted,
+                   not blasted to all.
+  COPY_HI        : "ज़रूरी अपडेट अभी तक नहीं देखा। App खोलें -
+                   https://partnerapp.wiom.in/page/home"
+  COPY_EN_GLOSS  : "Haven't seen the important update yet.
+                   Open the App - [deep link]"
+  CLASSIFICATION : Transactional / Service (to be human-confirmed
+                   against TRAI consent records before re-use as pattern)
   METRICS        : Pending — see results.md for updates
   DESIGNED_BY    : Campaign team
   STATUS         : deployed
   NOTES          : Only sent to non-completers. S2+ partners excluded.
+                   Copy logged 2026-04-15 from campaign team screenshot.
 
 ---
 
-### Entry 5
+### Entry 4
 
   DATE           : TBD (not yet deployed as of 2026-04-13)
   TYPE           : planned
@@ -133,7 +144,7 @@ No historical entries yet. All entries are within the rolling window.
 
 ---
 
-### Entry 6
+### Entry 5
 
   DATE           : TBD (not yet deployed as of 2026-04-13)
   TYPE           : planned
@@ -153,3 +164,8 @@ No historical entries yet. All entries are within the rolling window.
 
 *comms-log.md — L3-projects/project-csp-migration-apr26/*
 *Append-only. Next entry appended after next deployment.*
+
+SECURITY CHECK: PASS — PayG positioning intact (no subscription framing),
+no PII, copy within PCA tone envelope. Flag: Entry 3 classification
+(Transactional/Service) to be human-confirmed against TRAI consent
+records before re-use as a pattern.

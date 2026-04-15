@@ -3,7 +3,10 @@
     "allow": [
       "Bash(git --version)",
       "Bash(gh auth:*)",
-      "WebFetch(domain:shivakimothi-design.github.io)"
+      "WebFetch(domain:shivakimothi-design.github.io)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(git add:*)"
     ]
   }
 }
