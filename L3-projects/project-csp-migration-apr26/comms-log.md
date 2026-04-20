@@ -22,6 +22,8 @@ agent appends to it after every deployment.
   iterations.md documenting the plan-to-reality delta.
 
 ## LAST UPDATED
+2026-04-20 — Entry 7 appended: WA nudge to 651 quiz non-attempters on
+             2026-04-20. Copy byte-identical to Entry 3.
 2026-04-15 (pm) — Entry 6 appended: Recap + Quiz deployment on 15/04
              (evolved from planned Entry 4). Entry 4 annotated with
              closing line pointing to Entry 6. RULES section extended
@@ -232,10 +234,46 @@ No historical entries yet. All entries are within the rolling window.
 
 ---
 
+### Entry 7
+
+  DATE           : 2026-04-20
+  TYPE           : deploy
+  CHANNEL        : WhatsApp
+  MESSAGE_REF    : Post-launch — WA Nudge (quiz non-attempters)
+  AUDIENCE       : Partners who had not yet attempted the Recap + Quiz
+                   (Entry 6) as of 2026-04-20 morning. Source list:
+                   "Not completed reminder.xlsx" — phone numbers only.
+  AUDIENCE_SIZE  : 651
+  SUMMARY        : Hindi WhatsApp nudge redirecting quiz non-attempters
+                   back to the app via deep link. Targeted send to the
+                   pending pool only. Copy is byte-identical to Entry 3
+                   (the earlier WA nudge for blocker-video non-completers).
+  COPY_HI        : "ज़रूरी अपडेट अभी तक नहीं देखा। App खोलें -
+                   https://partnerapp.wiom.in/page/home"
+  COPY_EN_GLOSS  : "Haven't seen the important update yet.
+                   Open the App - [deep link]"
+  CLASSIFICATION : Transactional / Service (inherits Entry 3 flag —
+                   to be human-confirmed against TRAI consent records
+                   before re-use as a pattern)
+  METRICS        : Pending — see results.md for updates
+  DESIGNED_BY    : Human (ad-hoc, not via Comms AI pipeline)
+  STATUS         : deployed
+  NOTES          : Follows Entry 6 (Recap + Quiz, live since 2026-04-15).
+                   Targets the residual pool that hadn't attempted the
+                   quiz 5 days after launch. Copy is identical to Entry 3,
+                   so any partner who was an S0/S1 non-completer on
+                   09/04 AND is still a quiz non-attempter on 20/04 has
+                   now received this exact WA twice. Worth watching for
+                   WA template fatigue / report-spam signals before the
+                   next targeted nudge.
+
+---
+
 *comms-log.md — L3-projects/project-csp-migration-apr26/*
 *Append-only. Next entry appended after next deployment.*
 
 SECURITY CHECK: PASS — PayG positioning intact (no subscription framing),
-no PII, copy within PCA tone envelope. Flag: Entry 3 classification
-(Transactional/Service) to be human-confirmed against TRAI consent
-records before re-use as a pattern.
+no PII in log (phone list referenced generically, not reproduced), copy
+within PCA tone envelope. Flag carried forward: Entry 3 + Entry 7
+classification (Transactional/Service) to be human-confirmed against
+TRAI consent records before re-use as a pattern.
