@@ -23,6 +23,19 @@ Load this file when:
 6. Write output to review-queue/ — never anywhere else
 
 ## LAST UPDATED
+2026-04-27 — v1.3 — Contextual/journey-based messaging principle:
+  + Step 5d (Recall assumption check) added — mandatory for all
+    post-launch messages. Never assume recall. Every message must
+    carry one-line context to re-anchor the partner before the ask.
+    30-40% retention assumption for video/in-app education.
+  + GUARDRAILS: recall assumption rule added
+2026-04-27 — v1.2 — Process invention prevention:
+  + Step 5c: PROCESS STEP RULE added — hard stop when process is
+    undocumented. Must ask human → log GAPS.md → [PROCESS TBD]
+    placeholder. Never invent a process step.
+  + GUARDRAILS: explicit process invention prohibition added
+  + WHAT GOOD OUTPUT LOOKS LIKE: negative item added for invented
+    process instructions
 2026-04-13 — v1.1 — Recipient-centric message design:
   + Message Type Classification step (Type A/B/C) added to Mode 1 and Mode 2
   + Recipient Analysis step added (questions, hesitations, operational details)
@@ -193,6 +206,31 @@ Read these directly from the handoff block:
        to reassure. This aligns with PCA Principle 7: dignity
        without indulgence — clarity, not comfort.
 
+    d. Recall assumption check — mandatory for all post-launch messages
+
+       Never assume the recipient remembers prior communications.
+       Check comms-log.md for what was communicated before on this
+       topic. Then ask: if a partner absorbed only 30-40% of that
+       content (realistic for video/in-app education), does this
+       message still make sense? If the answer is no — the message
+       must carry enough context to be understood without relying
+       on recall.
+
+       This does not mean repeating prior education in full. It means:
+         - Name the subject (e.g. "PNM device in your office")
+           rather than referencing it as if already known
+         - State the relevance (e.g. "this measures your internet
+           quality for bonus calculation") in one line
+         - Then move to the new information or action
+
+       Rule: every message must be self-contained for a partner who
+       saw the earlier content but has not retained it. Context is
+       not repetition — it is the one line that re-anchors the partner
+       before asking them to act or understand something new.
+
+       Log to GAPS.md if no prior comms history is available to
+       assess recall baseline for this topic.
+
     c. Operational details needed for action
        What specific facts does the CSP need to complete the
        requested action? Examples:
@@ -201,10 +239,30 @@ Read these directly from the handoff block:
          - Who does what (who comes, who initiates contact?)
          - Cost (who bears cost, is there any CSP expense?)
          - What happens after (ongoing obligations, maintenance?)
+         - Problem/support process (what should the CSP do if something
+           goes wrong — who to contact, how, via which channel?)
        Every detail must trace to an operational fact (PCA Principle 1:
        structure first). If any detail is not in the brief, handoff
-       block, or context-from-teams: ask the human before drafting.
+       block, or context-from-teams: stop drafting and ask the human.
        Do not guess. Do not omit.
+
+       PROCESS STEP RULE — hard stop:
+       If the message includes or implies a "what to do if X" step
+       (e.g. device not working, issue with installation, support
+       needed) and no process is documented in the context files:
+         1. Do NOT invent a process (e.g. "raise a support ticket",
+            "call the helpline") — even if it sounds plausible.
+         2. Use AskUserQuestion to ask the human for the correct
+            process before drafting that section.
+         3. Log the missing process to system/GAPS.md using the
+            standard GAPS format before producing the output.
+         4. If the human cannot provide the process at that moment:
+            leave an explicit placeholder in the message copy —
+            [PROCESS TBD: e.g. "what should CSP do if device issue?"]
+            — and flag it in the QUALITY CHECK section.
+       A placeholder in the copy is always better than an invented
+       process. An invented process that reaches a partner is a
+       system failure.
 
     Record the recipient analysis in the output (see OUTPUT FORMAT).
 
@@ -616,6 +674,16 @@ SECURITY CHECK  : [PASS / FLAG: rule number — issue — what human needs to do
     context first. Context before ask — always.
   → If operational details (duration, cost, preparation, who does what)
     are unknown: ask the human before drafting. Do not guess or omit.
+  → Never assume a partner remembers prior comms. Every message must
+    carry the one-line context needed to re-anchor a partner who saw
+    earlier content but has not retained it. Check comms-log.md for
+    what was previously communicated on this topic before drafting.
+  → Never invent a process step (support channel, escalation path,
+    contact method) that is not documented in the context files.
+    If a process is needed and missing: ask → log to GAPS.md →
+    leave [PROCESS TBD] placeholder. Never substitute a plausible-
+    sounding guess. An invented process that reaches a partner is
+    a system failure.
   → Never over-answer: the message addresses only what the CSP needs
     to take the next step, not every possible question.
 
@@ -652,3 +720,6 @@ A complete design output does NOT:
     detail is available
   - Over-answer: the message is not an FAQ — it addresses only
     what the CSP needs to take the next step
+  - Contain invented process instructions (support channel, escalation
+    path, contact method) not confirmed by the human or present in
+    the context files — leave [PROCESS TBD] instead

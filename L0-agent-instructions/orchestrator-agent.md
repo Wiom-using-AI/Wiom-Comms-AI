@@ -135,6 +135,29 @@ then extract parameters accordingly.
     success_metric    → passed to design agent for measurement plan
     requested_by      → metadata only, included in handoff block
 
+  PROCESS PARAMETERS — ask when task involves operational content
+  ──────────────────────────────────────────────────────────────
+  When the task involves a device, physical installation, support
+  action, or any step the CSP must take in the real world, ask
+  the human for these before producing the handoff block.
+  If not asked here, the design agent will ask — but asking
+  upfront avoids a mid-design interruption.
+
+    support_process   → if something goes wrong, what should the CSP
+                        do? who do they contact, via which channel?
+                        (e.g. "call PTL", "raise in-app ticket",
+                         "WhatsApp support number X")
+    csp_action_steps  → what specific steps must the CSP take?
+                        in what order? any preparation required?
+    ongoing_obligation→ after the action, what must the CSP maintain
+                        or monitor? (e.g. "keep device ON at all times")
+
+  Rule: if the task input does not make these clear and they are
+  needed for the message (i.e. the message will tell the CSP what
+  to do when X), ask via AskUserQuestion before handing off.
+  Do not assume. Do not pass an empty field and let the design
+  agent guess — the design agent must never invent a process.
+
 ---
 
 ## PARAMETERS
@@ -577,6 +600,12 @@ or unmatched domain. Write it before producing the handoff block.
 ---
 
 ## LAST UPDATED
+2026-04-27 — v1.4 — Process parameters added to intake:
+  + PROCESS PARAMETERS block added to REQUIRED PARAMETERS section:
+    support_process, csp_action_steps, ongoing_obligation
+  + Rule: ask via AskUserQuestion when task involves operational
+    content requiring CSP action. Do not pass empty — design agent
+    must never invent a process.
 2026-03-27 — v1.3 — OS-level routing:
   + os_trigger replaces project_type as primary routing key
   + Multiple playbooks can be loaded per session (multi-OS tasks)
