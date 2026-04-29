@@ -22,6 +22,12 @@ agent appends to it after every deployment.
   iterations.md documenting the plan-to-reality delta.
 
 ## LAST UPDATED
+2026-04-27 — Entries 8 and 9 appended: PNM activity WA messages sent
+             to two cohorts — partners with PNM installed (Entry 8)
+             and partners without PNM installed (Entry 9). Both
+             include Wiom_PNM_Bonus.mp4 (1:02 min). New video asset
+             first appearance in log. Entry 9 introduces first
+             WhatsApp CTA button (Form bharein) in this project.
 2026-04-20 — Entry 7 appended: WA nudge to 651 quiz non-attempters on
              2026-04-20. Copy byte-identical to Entry 3.
 2026-04-15 (pm) — Entry 6 appended: Recap + Quiz deployment on 15/04
@@ -269,11 +275,104 @@ No historical entries yet. All entries are within the rolling window.
 
 ---
 
+---
+
+### Entry 8
+
+  DATE           : 2026-04-27
+  TYPE           : deploy
+  CHANNEL        : WhatsApp
+  MESSAGE_REF    : PNM Activity — Cohort 1 (PNM installed)
+  OS_TRIGGER     : quality + compensation
+  AUDIENCE       : Partners with PNM device already installed
+                   (PNM Status = "Activation Done")
+  AUDIENCE_SIZE  : 756
+  SOURCE_LIST    : pnm-partner-contacts-2026-04-29.csv
+                   (held locally — not reproduced in repo)
+  SUMMARY        : Hinglish WhatsApp message with embedded video
+                   (Wiom_PNM_Bonus.mp4, 1:02 min). Informs partners
+                   that their PNM device records internet quality and
+                   that bonus eligibility is based on this. CTA to
+                   keep device ON and watch video for details.
+  HEADER         : "Wiom System Update"
+  COPY_HI        : "Aapke office mein laga PNM device aapki internet
+                   quality record karta hai. Bonus eligibility isi ke
+                   anusar hoti hai."
+  COPY_BOLD_CTA  : "PNM device hamesha ON rakhein - video mein details
+                   dekhein."
+  VIDEO          : Wiom_PNM_Bonus.mp4 — 1:02 min, HD
+                   Thumbnail text: "New System — Bonus /
+                   अब Network Quality पर Bonus मिलेगा"
+                   (First appearance of this video asset in the log.
+                   File held by campaign team.)
+  BUTTON         : None
+  CLASSIFICATION : Service (same flag as Entries 3 and 7 — to be
+                   human-confirmed against TRAI consent records)
+  METRICS        : Pending — see results.md for updates
+  DESIGNED_BY    : Campaign team (not via Comms AI pipeline)
+  STATUS         : deployed
+  NOTES          : First direct WA communication on PNM device and
+                   bonus link for the cohort that has PNM installed.
+                   Pairs with Entry 9 (same day, different cohort).
+                   Audience size TBD — request from campaign team.
+
+---
+
+### Entry 9
+
+  DATE           : 2026-04-27
+  TYPE           : deploy
+  CHANNEL        : WhatsApp
+  MESSAGE_REF    : PNM Activity — Cohort 2 (PNM not installed)
+  OS_TRIGGER     : quality + compensation
+  AUDIENCE       : Partners without PNM device installed
+                   Status breakdown from source list:
+                     Denied        : 235
+                     Not Assigned  : 155
+                     Rescheduled   :  37
+                     Not Available :  15
+                     Assigned      :   3
+                     Total         : 445
+  AUDIENCE_SIZE  : 445
+  SOURCE_LIST    : pnm-partner-contacts-2026-04-29.csv
+                   (held locally — not reproduced in repo)
+  SUMMARY        : Hinglish WhatsApp message with embedded video
+                   (Wiom_PNM_Bonus.mp4, 1:02 min). Informs partners
+                   their PNM device has not been installed, explains
+                   its role in recording internet quality and
+                   determining bonus eligibility. CTA to fill a form
+                   to get device installed.
+  HEADER         : "Wiom System Update"
+  COPY_HI        : "Aapke location par PNM device abhi install nahi
+                   hua hai. Yeh device internet quality record karta
+                   hai — bonus eligibility isi ke anusar hoti hai."
+  COPY_BOLD_CTA  : "Device install karaane ke liye neeche diya gaya
+                   form bharein."
+  COPY_SECONDARY : "Video mein detail dekhein."
+  VIDEO          : Wiom_PNM_Bonus.mp4 — 1:02 min, HD (same as Entry 8)
+  BUTTON         : "Form bharein" (external link)
+                   Form URL : https://forms.gle/MGWVsUQozUCobh916
+  CLASSIFICATION : Service (same flag as Entries 3 and 7 — to be
+                   human-confirmed against TRAI consent records)
+  METRICS        : Pending — see results.md for updates
+  DESIGNED_BY    : Campaign team (not via Comms AI pipeline)
+  STATUS         : deployed
+  NOTES          : First WA message targeting partners without PNM.
+                   First use of a WhatsApp CTA button in this project.
+                   Form URL not captured — must be logged once confirmed.
+                   Pairs with Entry 8 (same day, different cohort).
+                   Audience size TBD — request from campaign team.
+
+---
+
 *comms-log.md — L3-projects/project-csp-migration-apr26/*
 *Append-only. Next entry appended after next deployment.*
 
 SECURITY CHECK: PASS — PayG positioning intact (no subscription framing),
-no PII in log (phone list referenced generically, not reproduced), copy
-within PCA tone envelope. Flag carried forward: Entry 3 + Entry 7
-classification (Transactional/Service) to be human-confirmed against
-TRAI consent records before re-use as a pattern.
+no PII in log (audience lists referenced generically, not reproduced),
+copy within PCA tone envelope, Hinglish copy reviewed — no forbidden
+terms, neutral-professional tone maintained.
+Flags carried forward:
+  Entry 3 + 7 + 8 + 9: message classification (Service) to be
+  human-confirmed against TRAI consent records before re-use as pattern.
+  Entry 9: Form URL confirmed — https://forms.gle/MGWVsUQozUCobh916
