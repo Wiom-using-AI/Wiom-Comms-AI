@@ -16,6 +16,14 @@ The dashboard updates in real time. This file captures snapshots
 at measurement checkpoints.
 
 ## LAST UPDATED
+2026-04-28 — Cycle 2 added: post-launch quiz attempt rate and PNM device
+             activation status (~Day 23 of campaign). 1,131 of 1,200 PNM
+             partners completed quiz (94.3%). 393 partners (32.8%) did
+             quiz but PNM activation NOT done — of these, 50.6% (199)
+             actively DENIED PNM activation. ~16% of total partner base
+             knowingly denied. This is the data triggering the M8 PNM
+             device + bonus eligibility comm (see review-queue/
+             project-csp-migration-apr26/2026-04-27-pnm-device-bonus-eligibility.md).
 2026-04-13 — initial version populated from dashboard (data as of 10/04).
 Maintained by: human or automated Metabase script.
 
@@ -107,12 +115,101 @@ used as reference.
 
 ---
 
-## Measurement Cycle 2 — (next checkpoint)
+## Measurement Cycle 2 — Quiz + PNM Activation Funnel (as of 28/04)
+
+  DATE           : 2026-04-28
+  PERIOD         : ~15/04 (quiz launch) to 28/04 (snapshot)
+  STAGE          : Post-launch — quiz adoption + PNM device activation
+  UNIVERSE       : 1,200 PNM partners
+  DEFINITIONS    : "Quiz Done" = either OWNER or ADMIN of the partner
+                   account completed quiz
+                   "PNM Done" = Activation Done (PNM device installed
+                   and operational)
+
+### Quiz × PNM activation cross-tab
+
+  CELL                         COUNT     % OF UNIVERSE
+  ---------------------------------------------------------
+  Quiz Done × PNM Done          738      61.5%   ← target state
+  Quiz Done × PNM Not Done      393      32.8%   ← key concern
+  Quiz Not Done × PNM Done       11       0.9%
+  Quiz Not Done × PNM Not Done   58       4.8%
+  ---------------------------------------------------------
+  Quiz Done totals             1,131     94.3%
+  PNM Done totals                749     62.4%
+
+### PNM Not Done — sub-status breakdown (n = 393)
+
+  PNM STATUS        COUNT    % OF 393    % OF UNIVERSE
+  ---------------------------------------------------------
+  Denied               199      50.6%        16.6%   ← critical
+  Not Assigned         145      36.9%        12.1%
+  Rescheduled           36       9.2%         3.0%
+  Not Available         12       3.1%         1.0%
+  Assigned               1       0.3%         0.1%
+
+### Headline read
+
+  METRIC                       VALUE       TARGET       STATUS
+  ---------------------------------------------------------------
+  Quiz attempt rate            94.3%       >70%         GREEN
+                               (1,131 / 1,200)
+  PNM activation rate          62.4%       100%         RED
+                               (749 / 1,200)
+  Quiz-to-PNM conversion       65.3%       —            Baseline
+                               (738 / 1,131 quiz-done partners)
+  Active PNM denial rate       16.6%       <5%          RED
+                               (199 of 1,200 — knowingly denied
+                               despite quiz exposure)
+
+  HYPOTHESIS_TESTED: The blocker video + 8-question quiz (Entry 6)
+  would drive sufficient understanding of PNM device's role in bonus
+  eligibility to result in PNM activation across the partner base.
+
+  RESULT: Hypothesis partially invalidated. Quiz attempt rate is high
+  (94.3%) — partners did engage with the verification mechanism. But
+  PNM activation funnel breaks down post-quiz: only 65.3% of
+  quiz-completers also activated PNM. More concerning: 16.6% of the
+  full base (199 partners) actively DENIED PNM activation despite
+  quiz exposure. This is a behaviour problem, not a knowledge gap —
+  these partners likely understand the PNM-bonus link but still
+  refused activation.
+
+  Per the L1-candidate Adoption System framework filed 2026-04-28
+  (review-queue/adhoc/), this profile fits "system change is a
+  behaviour problem, not a knowledge gap" — solution is event-driven
+  reinforcement at the moment of consequence (Event 3 — Bonus Loss
+  full-screen interrupt when bonus actually pauses), not pre-emptive
+  pre-loss WhatsApp education.
+
+  NEXT_ACTION:
+  - Investigate WHY 199 partners denied PNM. Possible drivers:
+    (a) distrust of measurement device, (b) physical space concern,
+    (c) electricity cost concern, (d) belief that bonus loss is
+    not real / negotiable, (e) preference for old contract.
+  - PTL outbound to a sample of the 199 deniers — qualitative
+    diagnosis of the actual block.
+  - Resolve M8 PNM comm design — see Karishni's PENDING brief at
+    review-queue/project-csp-migration-apr26/2026-04-27-pnm-device-
+    bonus-eligibility.md. Two open flags: audience scope, TRAI
+    classification.
+  - Tension: M8 brief uses pre-emptive WhatsApp framing
+    ("eligibility paused" conditional). New L1-candidate frameworks
+    (filed 2026-04-28) demand event-driven recorded-impact framing
+    via in-app full-screen Event 3 at moment of bonus pause. Human
+    decision needed: ship M8 as designed, or redesign per new
+    frameworks, or both (WA bridge + in-app interrupt).
+  - For "Not Assigned" (145) and "Rescheduled" (36): operational
+    follow-through, not comms problem. Different cohort.
+
+---
+
+## Measurement Cycle 3 — (next checkpoint)
 
   DATE           : TBD
   PERIOD         : TBD
-  STAGE          : TBD — will cover quiz deployment, app transition,
-                   and launch day metrics when available
+  STAGE          : TBD — will cover post-M8 PNM denial movement and
+                   any in-app event implementation
 
 ---
 

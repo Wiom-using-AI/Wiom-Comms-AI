@@ -11,6 +11,16 @@ from the message itself or from a change made partway through.
 - Include A/B test results where available.
 
 ## LAST UPDATED
+2026-04-30 — Iteration 4 added: M8 PNM device + bonus eligibility
+             evolved from planned WA text comm (Karishni's v2,
+             2026-04-27) into a deployed WhatsApp video
+             (Wiom_PNM_Bonus.mp4, 1:02). Captures: framework arrival
+             (Unified Attention Framework v1.3 + CSP App Adoption
+             System v1.2 filed 2026-04-28); in-app event-driven
+             approach deferred to new app launch; bonus-led framing
+             confirmed by partner mental-model insight; full
+             content principle log captured in
+             L2-domain-playbooks/content-improvement-log.md.
 2026-04-15 — Iteration 3 added: Recap + Quiz deployed 15/04. Captures
              plan-to-reality delta (5Q→8Q, 4/5→all correct, restart-on-
              wrong added, 15-sec video gate added). Also logs full quiz
@@ -188,6 +198,95 @@ Maintained by: design agent proposes, human confirms.
         A) NetBox rules, updated rate card — सब एक जगह  ✅
         B) सिर्फ़ Wiom का phone number
         C) सिर्फ़ पुराने bills की list
+
+---
+
+## Iteration 4 — M8 PNM Comm: Text → Video; Frameworks Filed (2026-04-28 to 2026-04-30)
+
+  WHAT CHANGED:
+  1. M8 deliverable evolved from WhatsApp text message (Karishni's v2
+     brief at review-queue/project-csp-migration-apr26/2026-04-27-
+     pnm-device-bonus-eligibility.md) to a 1:02-minute WhatsApp video
+     (Wiom_PNM_Bonus.mp4). Video sent to two cohorts on 2026-04-29:
+     - Entry 8 (comms-log): 756 PNM-installed partners
+     - Entry 9 (comms-log): 445 PNM-not-installed partners (with
+       form CTA: https://forms.gle/MGWVsUQozUCobh916)
+  2. Two product-team frameworks were filed mid-flight:
+     - Unified Attention Framework v1.3 (cross-project, in-app
+       attention rules) — promoted to L1-global/attention-framework.md
+       on 2026-04-30 under explicit human override (CLAUDE.md normally
+       forbids agent-authored L1 files)
+     - CSP App Adoption System v1.2 (migration-specific, three-phase
+       adoption + six locked event types) — filed at L3 project level
+       since per Shiva's reading it is migration-specific despite the
+       doc claiming permanence
+  3. Content principles surfaced from script iteration consolidated
+     into L2-domain-playbooks/content-improvement-log.md (15 principles
+     covering tone, framing, vocabulary, sequencing, surveillance
+     framing, transition disclosure, and pilot-partner positioning).
+
+  WHY IT CHANGED:
+  1. Video over text: better for the operational complexity (3 audiences
+     in one comm — quiz+PNM-done partners get reinforcement; 393 quiz-
+     done-but-PNM-not-done get the action; 16% deniers get the
+     consequence). Video carries more density per second.
+  2. Framework deferral: the new Adoption System framework demands
+     in-app full-screen Event 3 (recorded-impact past-tense framing)
+     for bonus-loss state changes — but the new app is not yet
+     deployed. WA video is the deployable channel for the current
+     partner base. Framework becomes the path for future designs once
+     the new app ships.
+  3. Bonus-led copy: per Shiva (2026-04-28), partners think in their
+     own word ("bonus") not the team's word ("rating" / "quality").
+     Copy was reordered to lead with the partner's stake, not the
+     mechanism.
+  4. 1-month grace period framing added per Satyam Darmora feedback
+     (2026-04-28): "Bonus is changing" without a window reads as
+     immediate pressure; with grace, partners get cognitive room.
+
+  HYPOTHESIS:
+  A short, bonus-led, factually-toned WhatsApp video — with explicit
+  consequence-of-breakage framing and a clear two-path action (keep ON
+  if installed; book a slot if not) — will move PNM activation among
+  the 32.8% quiz-done-but-PNM-not-done cohort more than a text-only
+  reminder would. Pre-emptive education is unlikely to move the 16%
+  active deniers; for them, the recorded-consequence framing in
+  Slide 4 ("PNM काम नहीं कर रहा? Bonus पर सीधा असर") sets up the
+  in-app Event 3 framework when it eventually ships.
+
+  RESULT:
+  Pending. Video deployed 2026-04-29 to ~1,201 partners across two
+  WhatsApp cohorts. Measure in 5-7 days:
+    - PNM activation movement among Entry 9 cohort (445 partners)
+    - Form submission rate for not-installed cohort
+    - Active-denial rate change (was 235 deniers per Karishni's
+      Apr 29 logging, up slightly from the 199 in this file's
+      Cycle 2 snapshot — denial appears to be growing not shrinking)
+    - Any PTL call spike on PNM device issues post-video
+
+  NOTES ON DATA RECONCILIATION:
+  This file's Measurement Cycle 2 (results.md) was snapshot on
+  2026-04-28 with 199 deniers and 393 PNM-not-done. Karishni's
+  Entry 8/9 audience data (Apr 29) shows 235 deniers and 445 PNM-not-
+  done — newer data, slightly different totals. Future Cycle 3 should
+  use the latest dashboard pull, not these snapshots.
+
+  CONTENT PRINCIPLES SURFACED (consolidated to content-improvement-log.md):
+  - Lead with partner's word ("bonus" not "rating")
+  - No excited tone for state-change comms
+  - Cause-effect chain over conditional warnings
+  - Specify install agent (Wiom installs the device)
+  - Temporal qualifiers in conditionals ("install हो चुकी है")
+  - Headings must not crowd the visual
+  - Long digit strings stay on screen, never in VO
+  - Sequence: mechanism → consequence → action
+  - Communicate transition / grace periods explicitly
+  - Vocabulary continuity within a campaign
+  - Avoid surveillance framing (passive measurement, not active monitoring)
+  - Tell partners directly when there's a hard cutoff
+  - Direct objective beats aspirational lever language
+  - Pilot partners are early-access stakeholders, not subjects
+  - Permission-to-break: tell pilot partners issues are expected
 
 ---
 
