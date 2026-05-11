@@ -22,6 +22,9 @@ agent appends to it after every deployment.
   iterations.md documenting the plan-to-reality delta.
 
 ## LAST UPDATED
+2026-05-11 — Entry 10 appended: internal comms journey dashboard
+             compiled from this log and published at
+             https://karishnipuri-star.github.io/csp-migration-preview/comms-journey.html
 2026-04-27 — Entries 8 and 9 appended: PNM activity WA messages sent
              to two cohorts — partners with PNM installed (Entry 8)
              and partners without PNM installed (Entry 9). Both
@@ -362,6 +365,32 @@ No historical entries yet. All entries are within the rolling window.
                    Form URL not captured — must be logged once confirmed.
                    Pairs with Entry 8 (same day, different cohort).
                    Audience size TBD — request from campaign team.
+
+---
+
+### Entry 10
+
+  DATE           : 2026-05-11
+  TYPE           : internal-artefact
+  CHANNEL        : Web (GitHub Pages)
+  MESSAGE_REF    : CSP Migration — Comms Journey Dashboard
+  AUDIENCE       : Internal (Wiom team)
+  SUMMARY        : Self-contained HTML dashboard compiling all 9 partner
+                   communications from this project in chronological order.
+                   Shows contextual popups, blocker video scripts, WhatsApp
+                   messages (rendered as live WA bubbles), recap+quiz copy
+                   (all 8 questions with answer options), and the pending
+                   in-app app-launch blocker. Videos embedded as base64.
+                   App launch preview embedded as live iframe.
+  URL            : https://karishnipuri-star.github.io/csp-migration-preview/comms-journey.html
+  SOURCE_FILE    : review-queue/adhoc/2026-05-09-csp-comms-dashboard.html
+  DESIGNED_BY    : Comms AI (design agent) — compiled 2026-05-09,
+                   published 2026-05-11
+  STATUS         : deployed
+  NOTES          : Not a partner communication. Internal reference artefact
+                   for team review and sharing. Sourced entirely from this
+                   log and iterations.md. Entry numbers removed from card
+                   headers. TRAI classification notes removed from view.
 
 ---
 
