@@ -22,6 +22,10 @@ agent appends to it after every deployment.
   iterations.md documenting the plan-to-reality delta.
 
 ## LAST UPDATED
+2026-05-13 — Entry 11 appended: Five belief break moments released in new
+             partner app. Three fully locked (A1, A3, A4) with inform +
+             quiz. Two inform-only for now (A2, A5 — quizzes pending).
+             Triggered at consequence moments, not assignment moments.
 2026-05-13 — Entry 10 appended: Old app blocker + new app launch deployed to
              61 CSPs and their field agents (rohits) on 2026-05-12. Two-screen
              in-app blocker with embedded video (wiom-csp-v19.mp4) and download
@@ -426,6 +430,84 @@ No historical entries yet. All entries are within the rolling window.
                    next iteration. 30-day grace period on financial
                    features is a new commitment not present in planned
                    Entry 5 — note for iterations.md.
+
+---
+
+### Entry 11
+
+  DATE           : 2026-05-13
+  TYPE           : deploy
+  CHANNEL        : In-App (new partner app — contextual belief breaks)
+  MESSAGE_REF    : Belief Break System v1.5 — Five Cases
+  APP_VERSION    : New partner app (post-transition)
+  AUDIENCE       : CSPs and their field agents (rohits)
+  AUDIENCE_SIZE  : 61 CSPs + rohits (same cohort as Entry 10)
+  MOCKUP_URL     : https://ashishagrawal-iam.github.io/wiom-belief-break-mockups/
+
+  SUMMARY        : Five contextual belief-correction moments released in
+                   the new app. Each triggers at a consequence moment —
+                   the instant a financial or behavioural outcome occurs —
+                   not at an assignment moment. Three cases fully locked
+                   (inform screen + quiz). Two cases inform-only for now
+                   (quiz copy pending). All screens follow a shared
+                   template: inform screen with "ठीक है" CTA, followed
+                   by a 3-option Hindi quiz where wrong answers show the
+                   correct answer with explanation.
+
+  CASE_A1        : Carry Fee — Two Paths Stop It
+    TRIGGER      : Day 16, first carry fee debit (after 15-day grace)
+    BELIEF_BREAK : Partner can install the NetBox OR return it to Wiom —
+                   both stop the fee immediately
+    STATUS       : Locked v1.5 — inform + quiz live
+    QUIZ         : "How do you stop the carry fee charge?"
+    CORRECT_ANS  : "NetBox install करें या Wiom को वापस करें"
+
+  CASE_A2        : Withdrawal Timing — Tuesday and Friday Only
+    TRIGGER      : First earnings credited to CSP wallet
+    BELIEF_BREAK : Withdrawals are restricted to Tuesday and Friday only
+    STATUS       : Inform locked v2 — quiz copy still in development
+    QUIZ         : Pending
+
+  CASE_A3        : ₹300 Per Activation — Not Per Recharge
+    TRIGGER      : First PayG plan connection activates and ₹300 credits
+    BELIEF_BREAK : ₹300 auto-credits on each new customer activation;
+                   existing customer recharges do not trigger payouts
+    STATUS       : Locked v1.5 — inform + quiz live
+    QUIZ         : "अगला connection activate करने पर भी ₹300 मिलेंगे?"
+    CORRECT_ANS  : Activation events only (one per customer); recharge
+                   events do not trigger commission
+
+  CASE_A4        : ₹50 Auto-Credits Every Pickup
+    TRIGGER      : First successful pickup completion and ₹50 credits
+    BELIEF_BREAK : Every successful pickup auto-credits ₹50 — no
+                   claiming required; it recurs on every pickup
+    STATUS       : Locked v1.5 — inform + quiz live
+    QUIZ         : "अगली pickup पर भी ₹50 मिलेंगे?"
+    CORRECT_ANS  : Automatic credit on every successful pickup; no
+                   action needed
+
+  CASE_A5        : Quality Score Drives Bonus and Work Volume
+    TRIGGER      : Onboarding day or first quality score available
+    BELIEF_BREAK : Quality score directly drives both bonus amount AND
+                   volume of tasks routed to the CSP
+    STATUS       : Inform locked v2 — quality measurement model pending;
+                   quiz TBD
+    QUIZ         : Pending
+
+  METRICS        : Pending — in-moment quiz pass rates to be tracked
+                   per case via CleverTap (event names to be confirmed
+                   with product team)
+  DESIGNED_BY    : Campaign team + Product (not via Comms AI pipeline)
+  STATUS         : deployed
+  NOTES          : Belief break system is the primary conceptual clarity
+                   mechanism for the measurement framework agreed
+                   2026-05-13. Operational clarity is measured separately
+                   via behavioural signals per case. A5 operational
+                   measurement is a known dependency on the quality
+                   measurement model (open question). Quiz copy for A2
+                   and A5 to be logged as a new entry when deployed.
+                   Implementation via MockAttentionRepository — no screen
+                   code changes as template is frozen.
 
 ---
 
