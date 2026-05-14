@@ -22,6 +22,10 @@ agent appends to it after every deployment.
   iterations.md documenting the plan-to-reality delta.
 
 ## LAST UPDATED
+2026-05-13 — Entry 10 appended: Old app blocker + new app launch deployed to
+             61 CSPs and their field agents (rohits) on 2026-05-12. Two-screen
+             in-app blocker with embedded video (wiom-csp-v19.mp4) and download
+             CTA. Entry 5 closed with pointer to Entry 10.
 2026-04-27 — Entries 8 and 9 appended: PNM activity WA messages sent
              to two cohorts — partners with PNM installed (Entry 8)
              and partners without PNM installed (Entry 9). Both
@@ -183,6 +187,7 @@ No historical entries yet. All entries are within the rolling window.
   STATUS         : pending
   NOTES          : This is the hard cutover. Partners below S2 cannot
                    proceed without completing education.
+                   → See Entry 10 for actual deployment on 2026-05-12.
 
 ---
 
@@ -362,6 +367,65 @@ No historical entries yet. All entries are within the rolling window.
                    Form URL not captured — must be logged once confirmed.
                    Pairs with Entry 8 (same day, different cohort).
                    Audience size TBD — request from campaign team.
+
+---
+
+### Entry 10
+
+  DATE           : 2026-05-12
+  TYPE           : deploy
+  CHANNEL        : In-App (blocker + new app redirect)
+  MESSAGE_REF    : App Transition — Old App Blocker + New App Launch
+  LINKED_PLAN    : Entry 5
+  APP_VERSION    : Old partner app (pre-transition)
+  AUDIENCE       : CSPs and their field agents (rohits)
+  AUDIENCE_SIZE  : 61 CSPs + rohits (exact rohit count not confirmed)
+  PREVIEW_URL    : https://shivakimothi-design.github.io/csp-migration-preview/
+
+  SUMMARY        : Old app now shows a 2-screen non-dismissible blocker.
+                   Partners cannot proceed past it without downloading the
+                   new app. Bilingual (Hindi / English). Introduces the
+                   "CSP" identity label for partners across the platform.
+                   30-day financial features grace period communicated.
+
+  SCREEN_1       : Blocker / Announcement
+    HEADER       : "Wiom System Update"
+    BODY_HI      : "नया ऐप नए सिस्टम में लाइव है"
+    BODY_EN      : "New App is live under the new system"
+    CTA_HI       : "जानें और डाउनलोड करें"
+    CTA_EN       : "Learn more & Download"
+    DESTINATION  : Screen 2 (transition.html)
+
+  SCREEN_2       : Transition / Detail
+    TAGLINE_HI   : "रिचार्ज वाला घर का नेट"
+    TAGLINE_EN   : "Pay-as-you-go home internet"
+    IDENTITY_NOTE: Partner is now designated "CSP" throughout the platform
+    VIDEO        : wiom-csp-v19.mp4 — embedded in screen
+                   Topics: bonus structures, payouts, NetBox, customer plans
+                   (exact script not captured — file held by campaign team)
+    GRACE_PERIOD : 30-day adjustment period communicated as 4 points:
+                   1. Full time to learn the new app
+                   2. Financial features (bonus, carry fee, etc.) not active
+                      for 30 days
+                   3. In-app guidance replaces separate training materials
+                   4. Support available on 78368-11111
+    CTA_HI       : "नया ऐप डाउनलोड करें"
+    CTA_EN       : "Download New App"
+
+  CREATIVE_FILE  : wiom-csp-v19.mp4 (file held by campaign team;
+                   not archived in repo)
+  METRICS        : Pending — not yet captured
+  DESIGNED_BY    : Campaign team (not via Comms AI pipeline)
+  STATUS         : deployed
+  NOTES          : This is the actual deployment of planned Entry 5
+                   (App Transition + hard lock). Audience is CSPs and
+                   their field agents (rohits), not the full ~1,400
+                   partner base from earlier entries — this is a scoped
+                   rollout to 61 CSPs at this stage. Video script not
+                   logged — must be captured from campaign team before
+                   next iteration. 30-day grace period on financial
+                   features is a new commitment not present in planned
+                   Entry 5 — note for iterations.md.
 
 ---
 
