@@ -44,7 +44,7 @@
     .hidden { display: none !important; }
 
     /* ── LEVEL 1: BELIEF GRID ── */
-    .l1-wrap { max-width: 680px; margin: 0 auto; padding: 36px 24px 60px; }
+    .l1-wrap { padding: 36px 24px 60px; }
     .beliefs-grid { display: flex; flex-direction: column; gap: 10px; }
     .belief-btn {
       background: var(--white); border: 1px solid var(--border); border-radius: 10px;
@@ -65,7 +65,7 @@
     .belief-arrow { color: var(--faint); font-size: 18px; flex-shrink: 0; }
 
     /* ── LEVEL 2: METRIC LIST ── */
-    .l2-wrap { max-width: 680px; margin: 0 auto; padding: 28px 24px 60px; }
+    .l2-wrap { padding: 28px 24px 60px; }
     .back-btn { background: none; border: none; cursor: pointer; font-family: 'Noto Sans', sans-serif; font-size: 13px; font-weight: 600; color: var(--pink); padding: 0; margin-bottom: 20px; display: inline-block; }
     .back-btn:hover { opacity: .75; }
     .l2-header { background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 16px 20px; margin-bottom: 20px; display: flex; align-items: center; gap: 14px; box-shadow: 0 1px 3px rgba(0,0,0,.04); }
@@ -97,7 +97,7 @@
     .mr-arrow { color: var(--faint); font-size: 16px; flex-shrink: 0; }
 
     /* ── LEVEL 3: SINGLE METRIC ── */
-    .l3-wrap { max-width: 600px; margin: 0 auto; padding: 28px 24px 60px; }
+    .l3-wrap { padding: 28px 24px 60px; }
     .l3-pills { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
     .pill { font-size: 11px; font-weight: 700; padding: 4px 11px; border-radius: 20px; letter-spacing: .03em; }
     .pill-belief  { background: var(--pink-light); color: var(--pink); }
@@ -129,7 +129,7 @@
     .l3-gap { background: #fff7ed; border: 1px solid #fed7aa; border-radius: 8px; padding: 12px 16px; font-size: 12px; color: #92400e; line-height: 1.6; margin-bottom: 16px; }
 
     /* ── TAB 2: DOD ANALYSIS ── */
-    .dod-main { max-width: 1100px; margin: 0 auto; padding: 36px 24px 60px; display: flex; flex-direction: column; gap: 28px; }
+    .dod-main { padding: 36px 24px 60px; display: flex; flex-direction: column; gap: 28px; }
     .dod-header-row { display: grid; grid-template-columns: repeat(2,1fr); gap: 16px; }
     .stat-card { background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; box-shadow: 0 1px 3px rgba(0,0,0,.04); }
     .stat-card .stat-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); margin-bottom: 8px; }
@@ -282,7 +282,6 @@
           <div class="bb-chips">
             <span class="chip chip-live">CSP calls live</span>
             <span class="chip chip-waiting">Quiz awaiting</span>
-            <span class="chip chip-pending">Dipstick pending</span>
           </div>
         </div>
         <div class="belief-arrow">›</div>
@@ -310,7 +309,6 @@
           <div class="bb-chips">
             <span class="chip chip-live">CSP calls live</span>
             <span class="chip chip-live">3 lagging live</span>
-            <span class="chip chip-pending">Dipstick pending</span>
           </div>
         </div>
         <div class="belief-arrow">›</div>
@@ -339,9 +337,6 @@
         </button>
         <button class="metric-row row-waiting" onclick="openMetric('b1-quiz')">
           <div class="mr-dot waiting"></div><div class="mr-name">Quiz pass rate</div><div class="mr-val">—</div><div class="mr-arrow">›</div>
-        </button>
-        <button class="metric-row row-pending" onclick="openMetric('b1-dipstick')">
-          <div class="mr-dot pending"></div><div class="mr-name">Dipstick study — Day 14</div><div class="mr-val">—</div><div class="mr-arrow">›</div>
         </button>
       </div>
     </div>
@@ -380,9 +375,6 @@
         <button class="metric-row row-waiting" onclick="openMetric('b2-quiz')">
           <div class="mr-dot waiting"></div><div class="mr-name">Quiz pass rate</div><div class="mr-val">—</div><div class="mr-arrow">›</div>
         </button>
-        <button class="metric-row row-pending" onclick="openMetric('b2-dipstick')">
-          <div class="mr-dot pending"></div><div class="mr-name">Dipstick study — Day 14</div><div class="mr-val">—</div><div class="mr-arrow">›</div>
-        </button>
       </div>
     </div>
     <div class="metric-section">
@@ -414,9 +406,6 @@
         <button class="metric-row row-waiting" onclick="openMetric('b3-quiz')">
           <div class="mr-dot waiting"></div><div class="mr-name">Quiz pass rate</div><div class="mr-val">—</div><div class="mr-arrow">›</div>
         </button>
-        <button class="metric-row row-pending" onclick="openMetric('b3-dipstick')">
-          <div class="mr-dot pending"></div><div class="mr-name">Dipstick study — Day 14</div><div class="mr-val">—</div><div class="mr-arrow">›</div>
-        </button>
       </div>
     </div>
   </div>
@@ -439,9 +428,6 @@
         </button>
         <button class="metric-row row-waiting" onclick="openMetric('b4-quiz')">
           <div class="mr-dot waiting"></div><div class="mr-name">Quiz pass rate</div><div class="mr-val">—</div><div class="mr-arrow">›</div>
-        </button>
-        <button class="metric-row row-pending" onclick="openMetric('b4-dipstick')">
-          <div class="mr-dot pending"></div><div class="mr-name">Dipstick study — Day 14</div><div class="mr-val">—</div><div class="mr-arrow">›</div>
         </button>
       </div>
     </div>
@@ -474,9 +460,6 @@
         <button class="metric-row row-waiting" onclick="openMetric('b5-quiz')">
           <div class="mr-dot waiting"></div><div class="mr-name">Quiz pass rate</div><div class="mr-val">—</div><div class="mr-arrow">›</div>
         </button>
-        <button class="metric-row row-pending" onclick="openMetric('b5-dipstick')">
-          <div class="mr-dot pending"></div><div class="mr-name">Dipstick study — Day 14</div><div class="mr-val">—</div><div class="mr-arrow">›</div>
-        </button>
         <button class="metric-row row-pending" onclick="openMetric('b5-lowqs')">
           <div class="mr-dot pending"></div><div class="mr-name">Low quality score partner call rate</div><div class="mr-val">—</div><div class="mr-arrow">›</div>
         </button>
@@ -485,15 +468,6 @@
     <div class="metric-section">
       <div class="metric-section-label">Lagging — Behavioural</div>
       <div class="metric-rows">
-        <button class="metric-row row-live" onclick="openMetric('b5-task')">
-          <div class="mr-dot live"></div><div class="mr-name">Task acceptance rate</div><div class="mr-val">86.1%</div><div class="mr-arrow">›</div>
-        </button>
-        <button class="metric-row row-live" onclick="openMetric('b5-bonus')">
-          <div class="mr-dot live"></div><div class="mr-name">Bonus trajectory — partners earning</div><div class="mr-val">684</div><div class="mr-arrow">›</div>
-        </button>
-        <button class="metric-row row-live" onclick="openMetric('b5-work')">
-          <div class="mr-dot live"></div><div class="mr-name">Repeat work allocation</div><div class="mr-val">199 partners</div><div class="mr-arrow">›</div>
-        </button>
       </div>
     </div>
   </div>
@@ -544,23 +518,6 @@
     <div class="l3-field"><div class="l3-field-label">Target</div><div class="l3-field-text">≥70% pass rate · 1 question, pass/fail</div></div>
     <div class="l3-field"><div class="l3-field-label">Source</div><div class="l3-field-text">In-app quiz module · CleverTap event: quiz_passed</div></div>
     <div class="l3-field"><div class="l3-field-label">Question framing</div><div class="l3-field-text">Tests whether partner understands the carry fee trigger (15 days idle) and rate (₹2/day)</div></div>
-  </div>
-
-  <!-- B1: Dipstick -->
-  <div id="l3-b1-dipstick" class="l3-wrap hidden">
-    <button class="back-btn" onclick="closeMetric()">← Carry Fee</button>
-    <div class="l3-pills">
-      <span class="pill pill-belief">Belief 1 · Carry Fee</span>
-      <span class="pill pill-leading">Leading</span>
-      <span class="pill pill-pending">Pending</span>
-    </div>
-    <div class="l3-name">Dipstick study — Day 14</div>
-    <div class="l3-value dim">Not started</div>
-    <div class="l3-value-sub">Due ~27 May 2026</div>
-    <div class="l3-divider"></div>
-    <div class="l3-field"><div class="l3-field-label">Design</div><div class="l3-field-text">50–60 PTL calls across 3 cohorts: quiz pass / video only / popup only · 5 open-ended questions testing recall</div></div>
-    <div class="l3-field"><div class="l3-field-label">Recall check</div><div class="l3-field-text">Can partner explain unprompted: (1) when carry fee starts, (2) how much it is, (3) how to stop it accruing</div></div>
-    <div class="l3-field"><div class="l3-field-label">Source</div><div class="l3-field-text">Manual PTL dipstick · Ops team</div></div>
   </div>
 
   <!-- B1: Time to install -->
@@ -661,22 +618,6 @@
     <div class="l3-field"><div class="l3-field-label">Source</div><div class="l3-field-text">In-app quiz module · CleverTap event: quiz_passed</div></div>
   </div>
 
-  <!-- B2: Dipstick -->
-  <div id="l3-b2-dipstick" class="l3-wrap hidden">
-    <button class="back-btn" onclick="closeMetric()">← Withdrawal Timing</button>
-    <div class="l3-pills">
-      <span class="pill pill-belief">Belief 2 · Withdrawal Timing</span>
-      <span class="pill pill-leading">Leading</span>
-      <span class="pill pill-pending">Pending</span>
-    </div>
-    <div class="l3-name">Dipstick study — Day 14</div>
-    <div class="l3-value dim">Not started</div>
-    <div class="l3-value-sub">Due ~27 May 2026</div>
-    <div class="l3-divider"></div>
-    <div class="l3-field"><div class="l3-field-label">Recall check</div><div class="l3-field-text">Can partner explain unprompted: (1) which days withdrawals are valid, (2) what happens if they try on an invalid day</div></div>
-    <div class="l3-field"><div class="l3-field-label">Source</div><div class="l3-field-text">Manual PTL dipstick · 50–60 calls · Ops team</div></div>
-  </div>
-
   <!-- B2: Failed withdrawals -->
   <div id="l3-b2-failed" class="l3-wrap hidden">
     <button class="back-btn" onclick="closeMetric()">← Withdrawal Timing</button>
@@ -741,22 +682,6 @@
     <div class="l3-field"><div class="l3-field-label">Source</div><div class="l3-field-text">In-app quiz module · CleverTap event: quiz_passed</div></div>
   </div>
 
-  <!-- B3: Dipstick -->
-  <div id="l3-b3-dipstick" class="l3-wrap hidden">
-    <button class="back-btn" onclick="closeMetric()">← ₹300 per Activation &amp; Recharge</button>
-    <div class="l3-pills">
-      <span class="pill pill-belief">Belief 3 · ₹300 Earnings</span>
-      <span class="pill pill-leading">Leading</span>
-      <span class="pill pill-pending">Pending</span>
-    </div>
-    <div class="l3-name">Dipstick study — Day 14</div>
-    <div class="l3-value dim">Not started</div>
-    <div class="l3-value-sub">Due ~27 May 2026</div>
-    <div class="l3-divider"></div>
-    <div class="l3-field"><div class="l3-field-label">Recall check</div><div class="l3-field-text">Can partner explain unprompted: (1) they earn on activation, (2) they also earn on every customer recharge, (3) both are ₹300</div></div>
-    <div class="l3-field"><div class="l3-field-label">Source</div><div class="l3-field-text">Manual PTL dipstick · 50–60 calls · Ops team</div></div>
-  </div>
-
   <!-- B4: CSP confusion calls -->
   <div id="l3-b4-calls" class="l3-wrap hidden">
     <button class="back-btn" onclick="closeMetric()">← ₹50 Auto-Credit per Pickup</button>
@@ -801,22 +726,6 @@
     <div class="l3-field"><div class="l3-field-label">Target</div><div class="l3-field-text">≥70% pass rate · 1 question, pass/fail</div></div>
     <div class="l3-field"><div class="l3-field-label">Question framing</div><div class="l3-field-text">Tests whether partner knows the ₹50 is automatic on every pickup — no action, form, or claim needed</div></div>
     <div class="l3-field"><div class="l3-field-label">Source</div><div class="l3-field-text">In-app quiz module · CleverTap event: quiz_passed</div></div>
-  </div>
-
-  <!-- B4: Dipstick -->
-  <div id="l3-b4-dipstick" class="l3-wrap hidden">
-    <button class="back-btn" onclick="closeMetric()">← ₹50 Auto-Credit per Pickup</button>
-    <div class="l3-pills">
-      <span class="pill pill-belief">Belief 4 · ₹50 Pickup</span>
-      <span class="pill pill-leading">Leading</span>
-      <span class="pill pill-pending">Pending</span>
-    </div>
-    <div class="l3-name">Dipstick study — Day 14</div>
-    <div class="l3-value dim">Not started</div>
-    <div class="l3-value-sub">Due ~27 May 2026</div>
-    <div class="l3-divider"></div>
-    <div class="l3-field"><div class="l3-field-label">Recall check</div><div class="l3-field-text">Can partner explain: (1) ₹50 credited per pickup, (2) it happens automatically — no claim needed, (3) it applies to every collection not just the first</div></div>
-    <div class="l3-field"><div class="l3-field-label">Source</div><div class="l3-field-text">Manual PTL dipstick · 50–60 calls · Ops team</div></div>
   </div>
 
   <!-- B4: Pickup completion rate -->
@@ -881,22 +790,6 @@
     <div class="l3-field"><div class="l3-field-label">Source</div><div class="l3-field-text">In-app quiz module · CleverTap event: quiz_passed</div></div>
   </div>
 
-  <!-- B5: Dipstick -->
-  <div id="l3-b5-dipstick" class="l3-wrap hidden">
-    <button class="back-btn" onclick="closeMetric()">← Quality Score</button>
-    <div class="l3-pills">
-      <span class="pill pill-belief">Belief 5 · Quality Score</span>
-      <span class="pill pill-leading">Leading</span>
-      <span class="pill pill-pending">Pending</span>
-    </div>
-    <div class="l3-name">Dipstick study — Day 14</div>
-    <div class="l3-value dim">Not started</div>
-    <div class="l3-value-sub">Due ~27 May 2026</div>
-    <div class="l3-divider"></div>
-    <div class="l3-field"><div class="l3-field-label">Recall check</div><div class="l3-field-text">Can partner explain: (1) what quality score is, (2) that the ₹120 bonus depends on it, (3) that lead volume is also affected</div></div>
-    <div class="l3-field"><div class="l3-field-label">Source</div><div class="l3-field-text">Manual PTL dipstick · 50–60 calls · Ops team</div></div>
-  </div>
-
   <!-- B5: Low quality score call rate -->
   <div id="l3-b5-lowqs" class="l3-wrap hidden">
     <button class="back-btn" onclick="closeMetric()">← Quality Score</button>
@@ -912,110 +805,6 @@
     <div class="l3-field"><div class="l3-field-label">What it measures</div><div class="l3-field-text">Partners with low quality scores who call about low leads or bonus clearly haven't connected score to outcomes. This cohort is the highest-risk group for belief gap.</div></div>
     <div class="l3-field"><div class="l3-field-label">Source</div><div class="l3-field-text">Metabase #11143 joined to quality score table via partner ID · Quality measurement model not yet live</div></div>
     <div class="l3-gap"><strong>Blocked:</strong> Quality measurement model not yet live. This metric can be built once partner quality scores are available in Snowflake.</div>
-  </div>
-
-  <!-- B5: Task acceptance rate -->
-  <div id="l3-b5-task" class="l3-wrap hidden">
-    <button class="back-btn" onclick="closeMetric()">← Quality Score</button>
-    <div class="l3-pills">
-      <span class="pill pill-belief">Belief 5 · Quality Score</span>
-      <span class="pill pill-lagging">Lagging</span>
-      <span class="pill pill-live">Live</span>
-    </div>
-    <div class="l3-name">Task acceptance rate</div>
-    <div class="l3-value">86.1%</div>
-    <div class="l3-value-sub">May 13 · 433 dispatched, 60 declined</div>
-    <div class="l3-dod">
-      <div class="l3-dod-label">Day-over-day · This week</div>
-      <table class="l3-dod-table">
-        <thead><tr><th>Mon 11</th><th>Tue 12</th><th>Wed 13</th></tr></thead>
-        <tbody>
-          <tr>
-            <td>85.8%</td>
-            <td><span class="trend-down">↓</span> 80.7%</td>
-            <td><span class="trend-up">↑</span> 86.1%</td>
-          </tr>
-          <tr>
-            <td class="sub">409 dispatched</td>
-            <td class="sub">336 dispatched</td>
-            <td class="sub">433 dispatched</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="l3-divider"></div>
-    <div class="l3-field"><div class="l3-field-label">What it measures</div><div class="l3-field-text">Partners who understand quality score drives future work volume should accept more tasks. Rising acceptance rate over weeks 2–4 is the signal to watch.</div></div>
-    <div class="l3-field"><div class="l3-field-label">Source</div><div class="l3-field-text"><code>taskvanilla_audit</code> (NOTIF_SENT vs DECLINED events) via <code>HIERARCHY_BASE</code></div></div>
-    <div class="l3-note">Tuesday dip (80.7%) coincides with lower dispatch volume (336 vs 400+). Likely day-of-week effect, not a trend break.</div>
-  </div>
-
-  <!-- B5: Bonus trajectory -->
-  <div id="l3-b5-bonus" class="l3-wrap hidden">
-    <button class="back-btn" onclick="closeMetric()">← Quality Score</button>
-    <div class="l3-pills">
-      <span class="pill pill-belief">Belief 5 · Quality Score</span>
-      <span class="pill pill-lagging">Lagging</span>
-      <span class="pill pill-live">Live</span>
-    </div>
-    <div class="l3-name">Bonus trajectory — partners earning</div>
-    <div class="l3-value">684</div>
-    <div class="l3-value-sub">Partners with commission credited on May 13 · Avg ₹17,402 per partner</div>
-    <div class="l3-dod">
-      <div class="l3-dod-label">Day-over-day · This week</div>
-      <table class="l3-dod-table">
-        <thead><tr><th>Mon 11</th><th>Tue 12</th><th>Wed 13</th></tr></thead>
-        <tbody>
-          <tr>
-            <td>743</td>
-            <td><span class="trend-up">↑</span> 753</td>
-            <td><span class="trend-down">↓</span> 684</td>
-          </tr>
-          <tr>
-            <td class="sub">₹18,073 avg</td>
-            <td class="sub">₹16,937 avg</td>
-            <td class="sub">₹17,402 avg</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="l3-divider"></div>
-    <div class="l3-field"><div class="l3-field-label">What it measures</div><div class="l3-field-text">Count of partners receiving commission each day. The quality-linked ₹120 bonus becomes meaningful from ~Day 14 when protection period ends. Watch for divergence between high-quality and low-quality partner earnings from that point.</div></div>
-    <div class="l3-field"><div class="l3-field-label">Source</div><div class="l3-field-text"><code>t_account_balance_sheet1</code> (action='COMMISSION_ADDED') · Note: verify whether <code>balance</code> field = transaction delta or running balance</div></div>
-  </div>
-
-  <!-- B5: Repeat work allocation -->
-  <div id="l3-b5-work" class="l3-wrap hidden">
-    <button class="back-btn" onclick="closeMetric()">← Quality Score</button>
-    <div class="l3-pills">
-      <span class="pill pill-belief">Belief 5 · Quality Score</span>
-      <span class="pill pill-lagging">Lagging</span>
-      <span class="pill pill-live">Live</span>
-    </div>
-    <div class="l3-name">Repeat work allocation</div>
-    <div class="l3-value">199 <span style="font-size:24px;font-weight:500;color:var(--muted);">partners</span></div>
-    <div class="l3-value-sub">May 13 · 433 total dispatches · 2.2 tasks per active partner</div>
-    <div class="l3-dod">
-      <div class="l3-dod-label">Day-over-day · This week</div>
-      <table class="l3-dod-table">
-        <thead><tr><th>Mon 11</th><th>Tue 12</th><th>Wed 13</th></tr></thead>
-        <tbody>
-          <tr>
-            <td>206</td>
-            <td><span class="trend-down">↓</span> 197</td>
-            <td><span class="trend-flat">→</span> 199</td>
-          </tr>
-          <tr>
-            <td class="sub">2.0 tasks avg</td>
-            <td class="sub">1.7 tasks avg</td>
-            <td class="sub">2.2 tasks avg</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="l3-divider"></div>
-    <div class="l3-field"><div class="l3-field-label">What it measures</div><div class="l3-field-text">Partners who understand quality score drives lead volume should try to maintain score to keep receiving work. The meaningful read here is divergence: high-quality partners receiving more tasks than low-quality ones.</div></div>
-    <div class="l3-field"><div class="l3-field-label">Source</div><div class="l3-field-text"><code>taskvanilla_audit</code> (NOTIF_SENT per partner per day) via <code>HIERARCHY_BASE</code></div></div>
-    <div class="l3-note">Quality score model not yet live — repeat allocation not yet split by score. First meaningful read ~June when protection period ends.</div>
   </div>
 
 </div><!-- end tab-beliefs -->
