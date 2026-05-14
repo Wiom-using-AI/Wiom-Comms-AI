@@ -1,0 +1,1253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Belief Break Clarity — CSP Migration</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --pink: #d9008d; --pink-light: #f9e5f3; --pink-mid: #f2c4e3;
+      --dark: #111827; --mid: #374151; --muted: #6b7280; --faint: #9ca3af;
+      --border: #e5e7eb; --bg: #f6f6f8; --white: #ffffff;
+      --live-bg: #fff0f8; --pending-bg: #f9fafb; --amber: #f59e0b;
+    }
+    body { font-family: 'Noto Sans', sans-serif; background: var(--bg); color: var(--dark); font-size: 14px; line-height: 1.6; }
+
+    /* HEADER */
+    .site-header { background: var(--pink); color: white; padding: 28px 40px 24px; }
+    .site-header .eyebrow { font-size: 11px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; opacity: .8; margin-bottom: 5px; }
+    .site-header h1 { font-size: 24px; font-weight: 700; letter-spacing: -.3px; margin-bottom: 4px; }
+    .site-header .subtitle { font-size: 13px; opacity: .85; }
+    .meta-strip { margin-top: 16px; display: flex; gap: 12px; flex-wrap: wrap; }
+    .meta-chip { background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.3); border-radius: 6px; padding: 4px 11px; font-size: 11px; font-weight: 500; }
+    .meta-chip span { opacity: .7; font-weight: 400; margin-right: 4px; }
+
+    /* TAB NAV */
+    .tab-nav { background: var(--white); border-bottom: 1px solid var(--border); padding: 0 40px; display: flex; }
+    .tab-btn { padding: 13px 20px; font-size: 13px; font-weight: 600; font-family: 'Noto Sans', sans-serif; color: var(--muted); background: none; border: none; border-bottom: 3px solid transparent; cursor: pointer; margin-bottom: -1px; transition: color .15s, border-color .15s; }
+    .tab-btn:hover { color: var(--dark); }
+    .tab-btn.active { color: var(--pink); border-bottom-color: var(--pink); }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* LEGEND */
+    .legend { background: var(--white); border-bottom: 1px solid var(--border); padding: 10px 40px; display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
+    .legend-label { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; margin-right: 4px; }
+    .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--mid); }
+    .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .dot-live { background: var(--pink); }
+    .dot-waiting { background: var(--amber); }
+    .dot-pending { background: var(--faint); }
+
+    .hidden { display: none !important; }
+
+    /* ── LEVEL 1: BELIEF GRID ── */
+    .l1-wrap { max-width: 680px; margin: 0 auto; padding: 36px 24px 60px; }
+    .beliefs-grid { display: flex; flex-direction: column; gap: 10px; }
+    .belief-btn {
+      background: var(--white); border: 1px solid var(--border); border-radius: 10px;
+      padding: 18px 22px; cursor: pointer; text-align: left;
+      display: grid; grid-template-columns: 36px 1fr auto; align-items: center; gap: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,.04); transition: border-color .15s, box-shadow .15s;
+      font-family: 'Noto Sans', sans-serif; width: 100%;
+    }
+    .belief-btn:hover { border-color: var(--pink-mid); box-shadow: 0 2px 8px rgba(217,0,141,.08); }
+    .belief-num { background: var(--pink); color: white; font-size: 14px; font-weight: 700; width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .bb-title { font-size: 15px; font-weight: 700; color: var(--dark); margin-bottom: 3px; }
+    .bb-desc { font-size: 12px; color: var(--muted); }
+    .bb-chips { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+    .chip { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: .05em; }
+    .chip-live { background: var(--live-bg); color: var(--pink); }
+    .chip-waiting { background: #fef3c7; color: #92400e; }
+    .chip-pending { background: var(--pending-bg); color: var(--faint); }
+    .belief-arrow { color: var(--faint); font-size: 18px; flex-shrink: 0; }
+
+    /* ── LEVEL 2: METRIC LIST ── */
+    .l2-wrap { max-width: 680px; margin: 0 auto; padding: 28px 24px 60px; }
+    .back-btn { background: none; border: none; cursor: pointer; font-family: 'Noto Sans', sans-serif; font-size: 13px; font-weight: 600; color: var(--pink); padding: 0; margin-bottom: 20px; display: inline-block; }
+    .back-btn:hover { opacity: .75; }
+    .l2-header { background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 16px 20px; margin-bottom: 20px; display: flex; align-items: center; gap: 14px; box-shadow: 0 1px 3px rgba(0,0,0,.04); }
+    .l2-num { background: var(--pink); color: white; font-size: 14px; font-weight: 700; width: 34px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .l2-title { font-size: 16px; font-weight: 700; color: var(--dark); margin-bottom: 2px; }
+    .l2-q { font-size: 12px; color: var(--muted); font-style: italic; }
+    .metric-section { margin-bottom: 20px; }
+    .metric-section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .09em; color: var(--muted); margin-bottom: 8px; padding: 0 2px; }
+    .metric-rows { display: flex; flex-direction: column; gap: 7px; }
+    .metric-row {
+      display: grid; grid-template-columns: 8px 1fr auto auto; align-items: center; gap: 14px;
+      padding: 14px 18px; background: var(--white); border: 1px solid var(--border); border-radius: 10px;
+      cursor: pointer; text-align: left; font-family: 'Noto Sans', sans-serif;
+      transition: border-color .15s, box-shadow .15s; box-shadow: 0 1px 2px rgba(0,0,0,.03); width: 100%;
+    }
+    .metric-row:hover { border-color: var(--pink-mid); box-shadow: 0 2px 8px rgba(217,0,141,.06); }
+    .metric-row.row-live    { border-left: 3px solid var(--pink); }
+    .metric-row.row-waiting { border-left: 3px solid var(--amber); }
+    .metric-row.row-pending { border-left: 3px solid #d1d5db; }
+    .mr-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .mr-dot.live    { background: var(--pink); }
+    .mr-dot.waiting { background: var(--amber); }
+    .mr-dot.pending { background: #d1d5db; }
+    .mr-name { font-size: 13px; font-weight: 600; color: var(--dark); }
+    .metric-row.row-pending .mr-name { color: var(--muted); }
+    .mr-val { font-size: 14px; font-weight: 700; color: var(--pink); text-align: right; white-space: nowrap; }
+    .metric-row.row-waiting .mr-val,
+    .metric-row.row-pending .mr-val { color: var(--faint); font-weight: 400; font-size: 13px; }
+    .mr-arrow { color: var(--faint); font-size: 16px; flex-shrink: 0; }
+
+    /* ── LEVEL 3: SINGLE METRIC ── */
+    .l3-wrap { max-width: 600px; margin: 0 auto; padding: 28px 24px 60px; }
+    .l3-pills { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
+    .pill { font-size: 11px; font-weight: 700; padding: 4px 11px; border-radius: 20px; letter-spacing: .03em; }
+    .pill-belief  { background: var(--pink-light); color: var(--pink); }
+    .pill-leading { background: #ede9fe; color: #5b21b6; }
+    .pill-lagging { background: #d1fae5; color: #065f46; }
+    .pill-live    { background: var(--live-bg); color: var(--pink); }
+    .pill-waiting { background: #fef3c7; color: #92400e; }
+    .pill-pending { background: #f3f4f6; color: var(--faint); }
+    .l3-name { font-size: 20px; font-weight: 700; color: var(--dark); line-height: 1.3; margin-bottom: 22px; }
+    .l3-value { font-size: 56px; font-weight: 700; color: var(--pink); line-height: 1; }
+    .l3-value.dim { font-size: 28px; color: var(--faint); font-weight: 500; }
+    .l3-value-sub { font-size: 13px; color: var(--muted); margin-top: 8px; margin-bottom: 28px; line-height: 1.5; }
+    .l3-dod { background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; margin-bottom: 24px; }
+    .l3-dod-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin-bottom: 12px; }
+    .l3-dod-table { width: 100%; border-collapse: collapse; }
+    .l3-dod-table th { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; padding: 6px 10px; text-align: center; border-bottom: 1px solid var(--border); }
+    .l3-dod-table td { font-size: 20px; font-weight: 700; color: var(--dark); padding: 12px 10px 4px; text-align: center; }
+    .l3-dod-table td.sub { font-size: 11px; font-weight: 400; color: var(--muted); padding: 2px 10px 10px; }
+    .l3-dod-table td.pend { font-size: 12px; font-weight: 500; color: var(--faint); font-style: italic; padding: 12px 10px 4px; }
+    .trend-up { color: #10b981; } .trend-down { color: #ef4444; } .trend-flat { color: var(--faint); }
+    .l3-divider { height: 1px; background: var(--border); margin: 20px 0; }
+    .l3-field { margin-bottom: 16px; }
+    .l3-field-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin-bottom: 5px; }
+    .l3-field-text { font-size: 13px; color: var(--mid); line-height: 1.6; }
+    .l3-field-text a { color: var(--pink); text-decoration: none; font-weight: 500; }
+    .l3-field-text a:hover { text-decoration: underline; }
+    .l3-field-text code { font-size: 11px; background: #f3f4f6; padding: 1px 5px; border-radius: 3px; font-family: monospace; }
+    .l3-note { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; font-size: 12px; color: var(--mid); line-height: 1.6; margin-bottom: 16px; }
+    .l3-gap { background: #fff7ed; border: 1px solid #fed7aa; border-radius: 8px; padding: 12px 16px; font-size: 12px; color: #92400e; line-height: 1.6; margin-bottom: 16px; }
+
+    /* ── TAB 2: DOD ANALYSIS ── */
+    .dod-main { max-width: 1100px; margin: 0 auto; padding: 36px 24px 60px; display: flex; flex-direction: column; gap: 28px; }
+    .dod-header-row { display: grid; grid-template-columns: repeat(2,1fr); gap: 16px; }
+    .stat-card { background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; box-shadow: 0 1px 3px rgba(0,0,0,.04); }
+    .stat-card .stat-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); margin-bottom: 8px; }
+    .stat-card .stat-value { font-size: 28px; font-weight: 700; color: var(--dark); line-height: 1; margin-bottom: 4px; }
+    .stat-card .stat-value.pink { color: var(--pink); }
+    .stat-card .stat-sub { font-size: 12px; color: var(--muted); }
+    .dod-section { background: var(--white); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,.05); }
+    .dod-section-header { padding: 16px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: baseline; gap: 10px; }
+    .dod-section-header h3 { font-size: 15px; font-weight: 700; color: var(--dark); }
+    .dod-section-header span { font-size: 12px; color: var(--muted); }
+    .dod-section-body { padding: 20px 24px; }
+    .res-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+    .res-row:last-child { margin-bottom: 0; }
+    .res-label { font-size: 12px; color: var(--mid); width: 200px; flex-shrink: 0; }
+    .res-bar-wrap { flex: 1; height: 8px; background: var(--bg); border-radius: 4px; overflow: hidden; }
+    .res-bar { height: 100%; border-radius: 4px; background: var(--pink); }
+    .res-count { font-size: 12px; font-weight: 600; color: var(--dark); width: 30px; text-align: right; flex-shrink: 0; }
+    .res-pct { font-size: 11px; color: var(--muted); width: 36px; text-align: right; flex-shrink: 0; }
+    .insight-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .insight-box { border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; }
+    .insight-box.flagged { border-left: 3px solid var(--pink); background: var(--live-bg); }
+    .insight-box.context { border-left: 3px solid #d1d5db; background: var(--pending-bg); }
+    .ib-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); margin-bottom: 6px; }
+    .ib-title { font-size: 13px; font-weight: 700; color: var(--dark); margin-bottom: 4px; }
+    .ib-count { font-size: 11px; color: var(--pink); font-weight: 600; margin-bottom: 6px; }
+    .ib-desc { font-size: 12px; color: var(--mid); line-height: 1.5; }
+    .verbatim-list { display: flex; flex-direction: column; gap: 14px; }
+    .verbatim { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+    .verbatim-meta { background: var(--bg); border-bottom: 1px solid var(--border); padding: 8px 14px; display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+    .vm-tag { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
+    .vm-belief { color: var(--pink); } .vm-disp { color: var(--muted); } .vm-date { color: var(--faint); font-size: 10px; }
+    .verbatim-body { padding: 14px 16px; }
+    .vb-hindi { font-size: 13px; color: var(--dark); line-height: 1.7; margin-bottom: 8px; padding: 10px 14px; background: #fafafa; border-radius: 6px; border-left: 3px solid var(--pink-mid); font-style: italic; }
+    .vb-translation { font-size: 12px; color: var(--mid); line-height: 1.6; }
+    .vb-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--faint); margin-bottom: 4px; }
+    /* ── Confusion Matrix ── */
+    .matrix-wrap { overflow-x: auto; }
+    .matrix-table { width: 100%; border-collapse: collapse; font-size: 12px; white-space: nowrap; }
+    .matrix-table thead tr { border-bottom: 2px solid var(--border); }
+    .matrix-table th { padding: 8px 12px; text-align: center; font-size: 11px; font-weight: 600; color: var(--muted); background: var(--bg); white-space: nowrap; }
+    .matrix-table th.matrix-belief-col { text-align: left; min-width: 175px; padding-left: 0; }
+    .matrix-table td { padding: 10px 12px; text-align: center; border-bottom: 1px solid var(--border); }
+    .matrix-belief-label { text-align: left !important; font-weight: 600; color: var(--dark); padding-left: 0 !important; }
+    .matrix-zero { color: #c9ced6; font-size: 12px; }
+    .matrix-hit { background: #fff0f5; color: var(--pink); font-weight: 700; border-radius: 4px; }
+    .matrix-pend { color: var(--faint); font-style: italic; }
+    .matrix-total td { background: var(--bg); font-weight: 700; color: var(--dark); border-top: 2px solid var(--border); border-bottom: none; }
+    .matrix-total .matrix-zero { color: var(--muted); }
+    .matrix-total .matrix-hit { background: #ffe4f0; color: var(--pink); }
+    .matrix-pre-note { font-size: 11px; color: var(--faint); margin-top: 12px; }
+    /* ── Matrix verbatim tooltip ── */
+    #mtt {
+      display: none; position: fixed; z-index: 9000;
+      max-width: 400px; min-width: 260px;
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: 10px; box-shadow: 0 6px 24px rgba(0,0,0,.13);
+      pointer-events: none; overflow: hidden;
+    }
+    #mtt .mtt-hdr {
+      background: var(--bg); border-bottom: 1px solid var(--border);
+      padding: 9px 14px; font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .07em; color: var(--pink);
+    }
+    #mtt .mtt-item {
+      padding: 11px 14px; font-size: 12px; color: var(--mid); line-height: 1.65;
+      border-bottom: 1px solid var(--border);
+    }
+    #mtt .mtt-item:last-child { border-bottom: none; }
+    #mtt .mtt-empty { padding: 12px 14px; font-size: 12px; color: var(--faint); font-style: italic; }
+    td.matrix-hit { cursor: help; }
+
+    footer { text-align: center; padding: 20px; font-size: 11px; color: var(--faint); border-top: 1px solid var(--border); background: var(--white); }
+
+    @media (max-width: 720px) {
+      .site-header, .tab-nav, .legend { padding-left: 16px; padding-right: 16px; }
+      .l1-wrap, .l2-wrap, .l3-wrap, .dod-main { padding-left: 12px; padding-right: 12px; }
+      .dod-header-row { grid-template-columns: 1fr 1fr; }
+      .insight-grid { grid-template-columns: 1fr; }
+      .l3-value { font-size: 40px; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="eyebrow">Wiom CSP Migration · May 2026</div>
+  <h1>Belief Break Clarity</h1>
+  <p class="subtitle">Are partners understanding the five things they need to act on correctly?</p>
+  <div class="meta-strip">
+    <div class="meta-chip"><span>System live</span>13 May 2026</div>
+    <div class="meta-chip"><span>Audience</span>~1,400 CSP partners</div>
+    <div class="meta-chip"><span>Last updated</span>14 May 2026</div>
+  </div>
+</header>
+
+<nav class="tab-nav">
+  <button class="tab-btn active" onclick="switchTab('beliefs',this)">Belief Break Metrics</button>
+  <button class="tab-btn" onclick="switchTab('dod',this)">Partner Call Analysis</button>
+</nav>
+
+<div class="legend" id="legend-bar">
+  <span class="legend-label">Status</span>
+  <div class="legend-item"><div class="dot dot-live"></div> Live with data</div>
+  <div class="legend-item"><div class="dot dot-waiting"></div> Live — awaiting data</div>
+  <div class="legend-item"><div class="dot dot-pending"></div> Pending — not yet built</div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     TAB 1 — BELIEF BREAK METRICS
+══════════════════════════════════════════ -->
+<div id="tab-beliefs" class="tab-panel active">
+
+  <!-- ── LEVEL 1: BELIEF GRID ── -->
+  <div id="l1" class="l1-wrap">
+    <div class="beliefs-grid">
+
+      <button class="belief-btn" onclick="openBelief(1)">
+        <div class="belief-num">1</div>
+        <div>
+          <div class="bb-title">Carry Fee</div>
+          <div class="bb-desc">₹2/day after 15 days with no active connection on a netbox</div>
+          <div class="bb-chips">
+            <span class="chip chip-live">CSP calls live</span>
+            <span class="chip chip-waiting">Quiz awaiting</span>
+            <span class="chip chip-pending">3 lagging pending</span>
+          </div>
+        </div>
+        <div class="belief-arrow">›</div>
+      </button>
+
+      <button class="belief-btn" onclick="openBelief(2)">
+        <div class="belief-num">2</div>
+        <div>
+          <div class="bb-title">Withdrawal Timing</div>
+          <div class="bb-desc">Withdrawals only possible on valid cycle days — not on-demand</div>
+          <div class="bb-chips">
+            <span class="chip chip-live">2 calls · app UX</span>
+            <span class="chip chip-waiting">Quiz awaiting</span>
+            <span class="chip chip-pending">Lagging — data gap</span>
+          </div>
+        </div>
+        <div class="belief-arrow">›</div>
+      </button>
+
+      <button class="belief-btn" onclick="openBelief(3)">
+        <div class="belief-num">3</div>
+        <div>
+          <div class="bb-title">₹300 per Activation &amp; Recharge</div>
+          <div class="bb-desc">Partner earns ₹300 on activation and on every customer recharge</div>
+          <div class="bb-chips">
+            <span class="chip chip-live">CSP calls live</span>
+            <span class="chip chip-waiting">Quiz awaiting</span>
+            <span class="chip chip-pending">Dipstick pending</span>
+          </div>
+        </div>
+        <div class="belief-arrow">›</div>
+      </button>
+
+      <button class="belief-btn" onclick="openBelief(4)">
+        <div class="belief-num">4</div>
+        <div>
+          <div class="bb-title">₹50 Auto-Credit per Pickup</div>
+          <div class="bb-desc">₹50 credited automatically on every netbox collection — no claim needed</div>
+          <div class="bb-chips">
+            <span class="chip chip-live">CSP calls live</span>
+            <span class="chip chip-waiting">Quiz awaiting</span>
+            <span class="chip chip-pending">Lagging pending</span>
+          </div>
+        </div>
+        <div class="belief-arrow">›</div>
+      </button>
+
+      <button class="belief-btn" onclick="openBelief(5)">
+        <div class="belief-num">5</div>
+        <div>
+          <div class="bb-title">Quality Score Drives Bonus &amp; Work Volume</div>
+          <div class="bb-desc">₹120 bonus and lead allocation are both tied to quality score</div>
+          <div class="bb-chips">
+            <span class="chip chip-live">CSP calls live</span>
+            <span class="chip chip-live">3 lagging live</span>
+            <span class="chip chip-pending">Dipstick pending</span>
+          </div>
+        </div>
+        <div class="belief-arrow">›</div>
+      </button>
+
+    </div>
+  </div>
+
+  <!-- ══ LEVEL 2: METRIC LISTS (one per belief) ══ -->
+
+  <!-- L2: Belief 1 -->
+  <div id="l2-b1" class="l2-wrap hidden">
+    <button class="back-btn" onclick="closeBelief()">← All beliefs</button>
+    <div class="l2-header">
+      <div class="l2-num">1</div>
+      <div>
+        <div class="l2-title">Carry Fee</div>
+        <div class="l2-q">Do partners act quickly after carry fee starts accruing?</div>
+      </div>
+    </div>
+    <div class="metric-section">
+      <div class="metric-section-label">Leading — Conceptual clarity</div>
+      <div class="metric-rows">
+        <button class="metric-row row-live" onclick="openMetric('b1-calls')">
+          <div class="mr-dot live"></div><div class="mr-name">CSP confusion calls</div><div class="mr-val"><!-- MVAL:b1-calls -->0 / 139<!-- /MVAL:b1-calls --></div><div class="mr-arrow">›</div>
+        </button>
+        <button class="metric-row row-waiting" onclick="openMetric('b1-quiz')">
+          <div class="mr-dot waiting"></div><div class="mr-name">Quiz pass rate</div><div class="mr-val">—</div><div class="mr-arrow">›</div>
+        </button>
+        <button class="metric-row row-pending" onclick="openMetric('b1-dipstick')">
+          <div class="mr-dot pending"></div><div class="mr-name">Dipstick study — Day 14</div><div class="mr-val">—</div><div class="mr-arrow">›</div>
+        </button>
+      </div>
+    </div>
+    <div class="metric-section">
+      <div class="metric-section-label">Lagging — Behavioural</div>
+      <div class="metric-rows">
+        <button class="metric-row row-pending" onclick="openMetric('b1-time')">
+          <div class="mr-dot pending"></div><div class="mr-name">Time to install and return after carry fee</div><div class="mr-val">—</div><div class="mr-arrow">›</div>
+        </button>
+        <button class="metric-row row-pending" onclick="openMetric('b1-fee')">
+          <div class="mr-dot pending"></div><div class="mr-name">Total fee accrued per incident</div><div class="mr-val">—</div><div class="mr-arrow">›</div>
+        </button>
+        <button class="metric-row row-pending" onclick="openMetric('b1-second')">
+          <div class="mr-dot pending"></div><div class="mr-name">Second incident resolution vs first</div><div class="mr-val">—</div><div class="mr-arrow">›</div>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- L2: Belief 2 -->
+  <div id="l2-b2" class="l2-wrap hidden">
+    <button class="back-btn" onclick="closeBelief()">← All beliefs</button>
+    <div class="l2-header">
+      <div class="l2-num">2</div>
+      <div>
+        <div class="l2-title">Withdrawal Timing</div>
+        <div class="l2-q">Do partners learn valid withdrawal timing and stop attempting on off-days?</div>
+      </div>
+    </div>
+    <div class="metric-section">
+      <div class="metric-section-label">Leading — Conceptual clarity</div>
+      <div class="metric-rows">
+        <button class="metric-row row-live" onclick="openMetric('b2-calls')">
+          <div class="mr-dot live"></div><div class="mr-name">CSP confusion calls</div><div class="mr-val"><!-- MVAL:b2-calls -->0 / 139<!-- /MVAL:b2-calls --></div><div class="mr-arrow">›</div>
+        </button>
+        <button class="metric-row row-waiting" onclick="openMetric('b2-quiz')">
+          <div class="mr-dot waiting"></div><div class="mr-name">Quiz pass rate</div><div class="mr-val">—</div><div class="mr-arrow">›</div>
+        </button>
+        <button class="metric-row row-pending" onclick="openMetric('b2-dipstick')">
+          <div class="mr-dot pending"></div><div class="mr-name">Dipstick study — Day 14</div><div class="mr-val">—</div><div class="mr-arrow">›</div>
+        </button>
+      </div>
+    </div>
+    <div class="metric-section">
+      <div class="metric-section-label">Lagging — Behavioural</div>
+      <div class="metric-rows">
+        <button class="metric-row row-pending" onclick="openMetric('b2-failed')">
+          <div class="mr-dot pending"></div><div class="mr-name">Failed withdrawal attempts on off-days</div><div class="mr-val">—</div><div class="mr-arrow">›</div>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- L2: Belief 3 -->
+  <div id="l2-b3" class="l2-wrap hidden">
+    <button class="back-btn" onclick="closeBelief()">← All beliefs</button>
+    <div class="l2-header">
+      <div class="l2-num">3</div>
+      <div>
+        <div class="l2-title">₹300 per Activation &amp; Recharge</div>
+        <div class="l2-q">Do partners understand they earn on both activation AND recharge events?</div>
+      </div>
+    </div>
+    <div class="metric-section">
+      <div class="metric-section-label">Leading — Conceptual clarity</div>
+      <div class="metric-rows">
+        <button class="metric-row row-live" onclick="openMetric('b3-calls')">
+          <div class="mr-dot live"></div><div class="mr-name">CSP confusion calls</div><div class="mr-val"><!-- MVAL:b3-calls -->0 / 139<!-- /MVAL:b3-calls --></div><div class="mr-arrow">›</div>
+        </button>
+        <button class="metric-row row-waiting" onclick="openMetric('b3-quiz')">
+          <div class="mr-dot waiting"></div><div class="mr-name">Quiz pass rate</div><div class="mr-val">—</div><div class="mr-arrow">›</div>
+        </button>
+        <button class="metric-row row-pending" onclick="openMetric('b3-dipstick')">
+          <div class="mr-dot pending"></div><div class="mr-name">Dipstick study — Day 14</div><div class="mr-val">—</div><div class="mr-arrow">›</div>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- L2: Belief 4 -->
+  <div id="l2-b4" class="l2-wrap hidden">
+    <button class="back-btn" onclick="closeBelief()">← All beliefs</button>
+    <div class="l2-header">
+      <div class="l2-num">4</div>
+      <div>
+        <div class="l2-title">₹50 Auto-Credit per Pickup</div>
+        <div class="l2-q">Do partners internalise that the credit is automatic and act on pickup tasks promptly?</div>
+      </div>
+    </div>
+    <div class="metric-section">
+      <div class="metric-section-label">Leading — Conceptual clarity</div>
+      <div class="metric-rows">
+        <button class="metric-row row-live" onclick="openMetric('b4-calls')">
+          <div class="mr-dot live"></div><div class="mr-name">CSP confusion calls</div><div class="mr-val"><!-- MVAL:b4-calls -->0 / 139<!-- /MVAL:b4-calls --></div><div class="mr-arrow">›</div>
+        </button>
+        <button class="metric-row row-waiting" onclick="openMetric('b4-quiz')">
+          <div class="mr-dot waiting"></div><div class="mr-name">Quiz pass rate</div><div class="mr-val">—</div><div class="mr-arrow">›</div>
+        </button>
+        <button class="metric-row row-pending" onclick="openMetric('b4-dipstick')">
+          <div class="mr-dot pending"></div><div class="mr-name">Dipstick study — Day 14</div><div class="mr-val">—</div><div class="mr-arrow">›</div>
+        </button>
+      </div>
+    </div>
+    <div class="metric-section">
+      <div class="metric-section-label">Lagging — Behavioural</div>
+      <div class="metric-rows">
+        <button class="metric-row row-pending" onclick="openMetric('b4-pickup')">
+          <div class="mr-dot pending"></div><div class="mr-name">Pickup completion rate over time</div><div class="mr-val">—</div><div class="mr-arrow">›</div>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- L2: Belief 5 -->
+  <div id="l2-b5" class="l2-wrap hidden">
+    <button class="back-btn" onclick="closeBelief()">← All beliefs</button>
+    <div class="l2-header">
+      <div class="l2-num">5</div>
+      <div>
+        <div class="l2-title">Quality Score Drives Bonus &amp; Work Volume</div>
+        <div class="l2-q">Do partners change behaviour toward quality-linked outcomes?</div>
+      </div>
+    </div>
+    <div class="metric-section">
+      <div class="metric-section-label">Leading — Conceptual clarity</div>
+      <div class="metric-rows">
+        <button class="metric-row row-live" onclick="openMetric('b5-calls')">
+          <div class="mr-dot live"></div><div class="mr-name">CSP confusion calls</div><div class="mr-val"><!-- MVAL:b5-calls -->0 / 139<!-- /MVAL:b5-calls --></div><div class="mr-arrow">›</div>
+        </button>
+        <button class="metric-row row-waiting" onclick="openMetric('b5-quiz')">
+          <div class="mr-dot waiting"></div><div class="mr-name">Quiz pass rate</div><div class="mr-val">—</div><div class="mr-arrow">›</div>
+        </button>
+        <button class="metric-row row-pending" onclick="openMetric('b5-dipstick')">
+          <div class="mr-dot pending"></div><div class="mr-name">Dipstick study — Day 14</div><div class="mr-val">—</div><div class="mr-arrow">›</div>
+        </button>
+        <button class="metric-row row-pending" onclick="openMetric('b5-lowqs')">
+          <div class="mr-dot pending"></div><div class="mr-name">Low quality score partner call rate</div><div class="mr-val">—</div><div class="mr-arrow">›</div>
+        </button>
+      </div>
+    </div>
+    <div class="metric-section">
+      <div class="metric-section-label">Lagging — Behavioural</div>
+      <div class="metric-rows">
+        <button class="metric-row row-live" onclick="openMetric('b5-task')">
+          <div class="mr-dot live"></div><div class="mr-name">Task acceptance rate</div><div class="mr-val">86.1%</div><div class="mr-arrow">›</div>
+        </button>
+        <button class="metric-row row-live" onclick="openMetric('b5-bonus')">
+          <div class="mr-dot live"></div><div class="mr-name">Bonus trajectory — partners earning</div><div class="mr-val">684</div><div class="mr-arrow">›</div>
+        </button>
+        <button class="metric-row row-live" onclick="openMetric('b5-work')">
+          <div class="mr-dot live"></div><div class="mr-name">Repeat work allocation</div><div class="mr-val">199 partners</div><div class="mr-arrow">›</div>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ LEVEL 3: SINGLE METRIC PANELS ══ -->
+
+  <!-- B1: CSP confusion calls -->
+  <div id="l3-b1-calls" class="l3-wrap hidden">
+    <button class="back-btn" onclick="closeMetric()">← Carry Fee</button>
+    <div class="l3-pills">
+      <span class="pill pill-belief">Belief 1 · Carry Fee</span>
+      <span class="pill pill-leading">Leading</span>
+      <span class="pill pill-live">Live</span>
+    </div>
+    <div class="l3-name">CSP confusion calls — carry fee</div>
+    <div class="l3-value"><!-- VAL:b1-calls -->0<!-- /VAL:b1-calls --></div>
+    <div class="l3-value-sub"><!-- SUB:b1-calls -->0 of 139 partner calls on 13 May flagged<!-- /SUB:b1-calls --></div>
+    <div class="l3-dod">
+    <!-- DOD:b1-calls -->
+    <div class="l3-dod-label">Day-over-day · Rolling 14 days · * pre-launch</div>
+      <table class="l3-dod-table">
+        <thead><tr><th>Fri 1*</th><th>Sat 2*</th><th>Sun 3*</th><th>Mon 4*</th><th>Wed 6*</th><th>Thu 7*</th><th>Fri 8*</th><th>Sat 9*</th><th>Sun 10*</th><th>Mon 11*</th><th>Tue 12*</th><th>Wed 13</th><th>Thu 14</th></tr></thead>
+        <tbody>
+          <tr><td>0</td><td><span class="trend-flat">→</span> 0</td><td><span class="trend-flat">→</span> 0</td><td><span class="trend-flat">→</span> 0</td><td><span class="trend-flat">→</span> 0</td><td><span class="trend-flat">→</span> 0</td><td><span class="trend-flat">→</span> 0</td><td><span class="trend-flat">→</span> 0</td><td><span class="trend-flat">→</span> 0</td><td><span class="trend-flat">→</span> 0</td><td><span class="trend-flat">→</span> 0</td><td><span class="trend-flat">→</span> 0</td><td class="pend">Pending</td></tr>
+          <tr><td class="sub">146 calls</td><td class="sub">115 calls</td><td class="sub">108 calls</td><td class="sub">100 calls</td><td class="sub">119 calls</td><td class="sub">141 calls</td><td class="sub">93 calls</td><td class="sub">111 calls</td><td class="sub">96 calls</td><td class="sub">115 calls</td><td class="sub">141 calls</td><td class="sub">139 calls</td><td class="sub">—</td></tr>
+        </tbody>
+      </table>
+    <!-- /DOD:b1-calls -->
+  </div>
+    <div class="l3-divider"></div>
+    <div class="l3-field"><div class="l3-field-label">Target</div><div class="l3-field-text">Zero or near-zero. A single spike is acceptable if root cause is app UX, not belief confusion.</div></div>
+    <div class="l3-field"><div class="l3-field-label">Signal logic</div><div class="l3-field-text">Topic: "carry fee" / "carry charge" / "per day charge" / "roz katega" / netbox + charge/katega · AND confusion signal: क्यों / nahi aaya / kat gaya / samajh nahi / galat / problem / issue</div></div>
+    <div class="l3-field"><div class="l3-field-label">Source</div><div class="l3-field-text"><a href="https://metabase.wiom.in/question/11143" target="_blank">Metabase #11143</a> · <code>CX_CALL_AUDIT_ANALYSIS_PROD_V1</code> (PartnerSupportQueue) · Last run: 13 May 2026</div></div>
+  </div>
+
+  <!-- B1: Quiz -->
+  <div id="l3-b1-quiz" class="l3-wrap hidden">
+    <button class="back-btn" onclick="closeMetric()">← Carry Fee</button>
+    <div class="l3-pills">
+      <span class="pill pill-belief">Belief 1 · Carry Fee</span>
+      <span class="pill pill-leading">Leading</span>
+      <span class="pill pill-waiting">Awaiting</span>
+    </div>
+    <div class="l3-name">Quiz pass rate</div>
+    <div class="l3-value dim">—</div>
+    <div class="l3-value-sub">Quiz module not yet deployed to all partners</div>
+    <div class="l3-divider"></div>
+    <div class="l3-field"><div class="l3-field-label">Target</div><div class="l3-field-text">≥70% pass rate · 1 question, pass/fail</div></div>
+    <div class="l3-field"><div class="l3-field-label">Source</div><div class="l3-field-text">In-app quiz module · CleverTap event: quiz_passed</div></div>
+    <div class="l3-field"><div class="l3-field-label">Question framing</div><div class="l3-field-text">Tests whether partner understands the carry fee trigger (15 days idle) and rate (₹2/day)</div></div>
+  </div>
+
+  <!-- B1: Dipstick -->
+  <div id="l3-b1-dipstick" class="l3-wrap hidden">
+    <button class="back-btn" onclick="closeMetric()">← Carry Fee</button>
+    <div class="l3-pills">
+      <span class="pill pill-belief">Belief 1 · Carry Fee</span>
+      <span class="pill pill-leading">Leading</span>
+      <span class="pill pill-pending">Pending</span>
+    </div>
+    <div class="l3-name">Dipstick study — Day 14</div>
+    <div class="l3-value dim">Not started</div>
+    <div class="l3-value-sub">Due ~27 May 2026</div>
+    <div class="l3-divider"></div>
+    <div class="l3-field"><div class="l3-field-label">Design</div><div class="l3-field-text">50–60 PTL calls across 3 cohorts: quiz pass / video only / popup only · 5 open-ended questions testing recall</div></div>
+    <div class="l3-field"><div class="l3-field-label">Recall check</div><div class="l3-field-text">Can partner explain unprompted: (1) when carry fee starts, (2) how much it is, (3) how to stop it accruing</div></div>
+    <div class="l3-field"><div class="l3-field-label">Source</div><div class="l3-field-text">Manual PTL dipstick · Ops team</div></div>
+  </div>
+
+  <!-- B1: Time to install -->
+  <div id="l3-b1-time" class="l3-wrap hidden">
+    <button class="back-btn" onclick="closeMetric()">← Carry Fee</button>
+    <div class="l3-pills">
+      <span class="pill pill-belief">Belief 1 · Carry Fee</span>
+      <span class="pill pill-lagging">Lagging</span>
+      <span class="pill pill-pending">Pending</span>
+    </div>
+    <div class="l3-name">Time to install and return after carry fee starts</div>
+    <div class="l3-value dim">Not started</div>
+    <div class="l3-value-sub">Days between carry fee trigger and netbox recovery or new install</div>
+    <div class="l3-divider"></div>
+    <div class="l3-field"><div class="l3-field-label">What it measures</div><div class="l3-field-text">Partners who understand the carry fee should act quickly once it starts. Declining average resolution time week-on-week indicates the belief is internalised.</div></div>
+    <div class="l3-field"><div class="l3-field-label">Source</div><div class="l3-field-text"><code>service_ticket_model</code> (ticket_type_final=1) + <code>t_account_balance_sheet1</code> carry fee deduction events · Carry fee action type not yet documented in schema</div></div>
+    <div class="l3-gap"><strong>Data gap:</strong> Carry fee action type in <code>t_account_balance_sheet1</code> not yet documented. Needs schema check before this metric can be built.</div>
+  </div>
+
+  <!-- B1: Total fee accrued -->
+  <div id="l3-b1-fee" class="l3-wrap hidden">
+    <button class="back-btn" onclick="closeMetric()">← Carry Fee</button>
+    <div class="l3-pills">
+      <span class="pill pill-belief">Belief 1 · Carry Fee</span>
+      <span class="pill pill-lagging">Lagging</span>
+      <span class="pill pill-pending">Pending</span>
+    </div>
+    <div class="l3-name">Total fee accrued per incident</div>
+    <div class="l3-value dim">Not started</div>
+    <div class="l3-value-sub">Average ₹ carry fee accumulated per idle netbox case</div>
+    <div class="l3-divider"></div>
+    <div class="l3-field"><div class="l3-field-label">What it measures</div><div class="l3-field-text">High average fee = partner waited too long to act. Should decline over time as awareness builds. Partners who understand the ₹2/day rate act faster.</div></div>
+    <div class="l3-field"><div class="l3-field-label">Source</div><div class="l3-field-text"><code>t_account_balance_sheet1</code> (carry fee deduction action, grouped by partner + incident) · Same action type gap as above</div></div>
+    <div class="l3-gap"><strong>Data gap:</strong> Same as above — carry fee action type not documented.</div>
+  </div>
+
+  <!-- B1: Second incident -->
+  <div id="l3-b1-second" class="l3-wrap hidden">
+    <button class="back-btn" onclick="closeMetric()">← Carry Fee</button>
+    <div class="l3-pills">
+      <span class="pill pill-belief">Belief 1 · Carry Fee</span>
+      <span class="pill pill-lagging">Lagging</span>
+      <span class="pill pill-pending">Pending</span>
+    </div>
+    <div class="l3-name">Second incident resolution vs first</div>
+    <div class="l3-value dim">Not started</div>
+    <div class="l3-value-sub">Does resolution speed improve after a partner's first carry fee experience?</div>
+    <div class="l3-divider"></div>
+    <div class="l3-field"><div class="l3-field-label">What it measures</div><div class="l3-field-text">A partner who truly learned from the first incident should resolve the second one faster. Compares time-to-resolve for incident 1 vs incident 2 per partner.</div></div>
+    <div class="l3-field"><div class="l3-field-label">Source</div><div class="l3-field-text"><code>t_account_balance_sheet1</code> partitioned by partner ID, ordered by carry fee event timestamp · Same action type gap</div></div>
+    <div class="l3-gap"><strong>Data gap:</strong> Carry fee action type not documented. Also requires at least 2 incidents per partner — will be meaningful only after ~4–6 weeks.</div>
+  </div>
+
+  <!-- B2: CSP confusion calls -->
+  <div id="l3-b2-calls" class="l3-wrap hidden">
+    <button class="back-btn" onclick="closeMetric()">← Withdrawal Timing</button>
+    <div class="l3-pills">
+      <span class="pill pill-belief">Belief 2 · Withdrawal Timing</span>
+      <span class="pill pill-leading">Leading</span>
+      <span class="pill pill-live">Live</span>
+    </div>
+    <div class="l3-name">CSP confusion calls — withdrawal timing</div>
+    <div class="l3-value"><!-- VAL:b2-calls -->0<!-- /VAL:b2-calls --></div>
+    <div class="l3-value-sub"><!-- SUB:b2-calls -->0 of 139 partner calls on 13 May flagged<!-- /SUB:b2-calls --></div>
+    <div class="l3-dod">
+    <!-- DOD:b2-calls -->
+    <div class="l3-dod-label">Day-over-day · Rolling 14 days · * pre-launch</div>
+      <table class="l3-dod-table">
+        <thead><tr><th>Fri 1*</th><th>Sat 2*</th><th>Sun 3*</th><th>Mon 4*</th><th>Wed 6*</th><th>Thu 7*</th><th>Fri 8*</th><th>Sat 9*</th><th>Sun 10*</th><th>Mon 11*</th><th>Tue 12*</th><th>Wed 13</th><th>Thu 14</th></tr></thead>
+        <tbody>
+          <tr><td>0</td><td><span class="trend-flat">→</span> 0</td><td><span class="trend-flat">→</span> 0</td><td><span class="trend-flat">→</span> 0</td><td><span class="trend-flat">→</span> 0</td><td><span class="trend-flat">→</span> 0</td><td><span class="trend-flat">→</span> 0</td><td><span class="trend-flat">→</span> 0</td><td><span class="trend-flat">→</span> 0</td><td><span class="trend-flat">→</span> 0</td><td><span class="trend-flat">→</span> 0</td><td><span class="trend-flat">→</span> 0</td><td class="pend">Pending</td></tr>
+          <tr><td class="sub">146 calls</td><td class="sub">115 calls</td><td class="sub">108 calls</td><td class="sub">100 calls</td><td class="sub">119 calls</td><td class="sub">141 calls</td><td class="sub">93 calls</td><td class="sub">111 calls</td><td class="sub">96 calls</td><td class="sub">115 calls</td><td class="sub">141 calls</td><td class="sub">139 calls</td><td class="sub">—</td></tr>
+        </tbody>
+      </table>
+    <!-- /DOD:b2-calls -->
+  </div>
+    <div class="l3-note">Both Wed 13 calls were about the wallet section disappearing after an app update — not confusion about withdrawal timing rules. Root cause is a likely UX regression. Check Partner Call Analysis tab for verbatims. Mon 11 call (pre-launch) was a similar wallet navigation question.</div>
+    <div class="l3-divider"></div>
+    <div class="l3-field"><div class="l3-field-label">Target</div><div class="l3-field-text">Zero true rule-confusion calls. App UX issues are a separate signal.</div></div>
+    <div class="l3-field"><div class="l3-field-label">Signal logic</div><div class="l3-field-text">Topic: "withdrawal" / "withdraw" / निकाल + (पैसे / wallet / paisa / commission) · AND confusion signal: क्यों / nahi aaya / kat gaya / samajh nahi / galat / problem / issue</div></div>
+    <div class="l3-field"><div class="l3-field-label">Source</div><div class="l3-field-text"><a href="https://metabase.wiom.in/question/11143" target="_blank">Metabase #11143</a> · <code>CX_CALL_AUDIT_ANALYSIS_PROD_V1</code> (PartnerSupportQueue) · Last run: 13 May 2026</div></div>
+  </div>
+
+  <!-- B2: Quiz -->
+  <div id="l3-b2-quiz" class="l3-wrap hidden">
+    <button class="back-btn" onclick="closeMetric()">← Withdrawal Timing</button>
+    <div class="l3-pills">
+      <span class="pill pill-belief">Belief 2 · Withdrawal Timing</span>
+      <span class="pill pill-leading">Leading</span>
+      <span class="pill pill-waiting">Awaiting</span>
+    </div>
+    <div class="l3-name">Quiz pass rate</div>
+    <div class="l3-value dim">—</div>
+    <div class="l3-value-sub">Quiz module not yet deployed to all partners</div>
+    <div class="l3-divider"></div>
+    <div class="l3-field"><div class="l3-field-label">Target</div><div class="l3-field-text">≥70% pass rate · 1 question, pass/fail</div></div>
+    <div class="l3-field"><div class="l3-field-label">Question framing</div><div class="l3-field-text">Tests whether partner knows withdrawals only happen on valid cycle days — not available on-demand at any time</div></div>
+    <div class="l3-field"><div class="l3-field-label">Source</div><div class="l3-field-text">In-app quiz module · CleverTap event: quiz_passed</div></div>
+  </div>
+
+  <!-- B2: Dipstick -->
+  <div id="l3-b2-dipstick" class="l3-wrap hidden">
+    <button class="back-btn" onclick="closeMetric()">← Withdrawal Timing</button>
+    <div class="l3-pills">
+      <span class="pill pill-belief">Belief 2 · Withdrawal Timing</span>
+      <span class="pill pill-leading">Leading</span>
+      <span class="pill pill-pending">Pending</span>
+    </div>
+    <div class="l3-name">Dipstick study — Day 14</div>
+    <div class="l3-value dim">Not started</div>
+    <div class="l3-value-sub">Due ~27 May 2026</div>
+    <div class="l3-divider"></div>
+    <div class="l3-field"><div class="l3-field-label">Recall check</div><div class="l3-field-text">Can partner explain unprompted: (1) which days withdrawals are valid, (2) what happens if they try on an invalid day</div></div>
+    <div class="l3-field"><div class="l3-field-label">Source</div><div class="l3-field-text">Manual PTL dipstick · 50–60 calls · Ops team</div></div>
+  </div>
+
+  <!-- B2: Failed withdrawals -->
+  <div id="l3-b2-failed" class="l3-wrap hidden">
+    <button class="back-btn" onclick="closeMetric()">← Withdrawal Timing</button>
+    <div class="l3-pills">
+      <span class="pill pill-belief">Belief 2 · Withdrawal Timing</span>
+      <span class="pill pill-lagging">Lagging</span>
+      <span class="pill pill-pending">Pending</span>
+    </div>
+    <div class="l3-name">Failed withdrawal attempts on off-days</div>
+    <div class="l3-value dim">Not started</div>
+    <div class="l3-value-sub">Failed attempts on invalid days as % of total withdrawal attempts</div>
+    <div class="l3-divider"></div>
+    <div class="l3-field"><div class="l3-field-label">What it measures</div><div class="l3-field-text">Partners who learned the valid withdrawal window stop attempting on off-days. Declining % week-on-week indicates belief internalisation.</div></div>
+    <div class="l3-field"><div class="l3-field-label">Target direction</div><div class="l3-field-text">Declining % week-on-week. Day 1 rate is the baseline.</div></div>
+    <div class="l3-field"><div class="l3-field-label">Source</div><div class="l3-field-text"><code>t_account_balance_sheet1</code> (action='AMOUNT_WITHDRAWN' = successes only)</div></div>
+    <div class="l3-gap"><strong>Hard data gap:</strong> No failed withdrawal attempt log exists in documented tables. <code>t_account_balance_sheet1</code> only records successful withdrawals. Failed attempts are not captured. Needs investigation with data engineering.</div>
+  </div>
+
+  <!-- B3: CSP confusion calls -->
+  <div id="l3-b3-calls" class="l3-wrap hidden">
+    <button class="back-btn" onclick="closeMetric()">← ₹300 per Activation &amp; Recharge</button>
+    <div class="l3-pills">
+      <span class="pill pill-belief">Belief 3 · ₹300 Earnings</span>
+      <span class="pill pill-leading">Leading</span>
+      <span class="pill pill-live">Live</span>
+    </div>
+    <div class="l3-name">CSP confusion calls — ₹300 earnings</div>
+    <div class="l3-value"><!-- VAL:b3-calls -->0<!-- /VAL:b3-calls --></div>
+    <div class="l3-value-sub"><!-- SUB:b3-calls -->0 of 139 partner calls on 13 May flagged<!-- /SUB:b3-calls --></div>
+    <div class="l3-dod">
+    <!-- DOD:b3-calls -->
+    <div class="l3-dod-label">Day-over-day · Rolling 14 days · * pre-launch</div>
+      <table class="l3-dod-table">
+        <thead><tr><th>Fri 1*</th><th>Sat 2*</th><th>Sun 3*</th><th>Mon 4*</th><th>Wed 6*</th><th>Thu 7*</th><th>Fri 8*</th><th>Sat 9*</th><th>Sun 10*</th><th>Mon 11*</th><th>Tue 12*</th><th>Wed 13</th><th>Thu 14</th></tr></thead>
+        <tbody>
+          <tr><td>0</td><td><span class="trend-flat">→</span> 0</td><td><span class="trend-flat">→</span> 0</td><td><span class="trend-flat">→</span> 0</td><td><span class="trend-flat">→</span> 0</td><td><span class="trend-flat">→</span> 0</td><td><span class="trend-flat">→</span> 0</td><td><span class="trend-flat">→</span> 0</td><td><span class="trend-flat">→</span> 0</td><td><span class="trend-flat">→</span> 0</td><td><span class="trend-flat">→</span> 0</td><td><span class="trend-flat">→</span> 0</td><td class="pend">Pending</td></tr>
+          <tr><td class="sub">146 calls</td><td class="sub">115 calls</td><td class="sub">108 calls</td><td class="sub">100 calls</td><td class="sub">119 calls</td><td class="sub">141 calls</td><td class="sub">93 calls</td><td class="sub">111 calls</td><td class="sub">96 calls</td><td class="sub">115 calls</td><td class="sub">141 calls</td><td class="sub">139 calls</td><td class="sub">—</td></tr>
+        </tbody>
+      </table>
+    <!-- /DOD:b3-calls -->
+  </div>
+    <div class="l3-divider"></div>
+    <div class="l3-field"><div class="l3-field-label">Target</div><div class="l3-field-text">Zero or near-zero confusion calls about recharge-linked earnings. Watch especially for "commission nahi aaya" after recharge events.</div></div>
+    <div class="l3-field"><div class="l3-field-label">Signal logic</div><div class="l3-field-text">Topic: (commission / 300 / teen sau / तीन सौ) + (recharge / activation / earning) · AND confusion signal: क्यों / nahi aaya / samajh nahi / galat / problem / issue</div></div>
+    <div class="l3-field"><div class="l3-field-label">Source</div><div class="l3-field-text"><a href="https://metabase.wiom.in/question/11143" target="_blank">Metabase #11143</a> · <code>CX_CALL_AUDIT_ANALYSIS_PROD_V1</code> · Last run: 13 May 2026</div></div>
+  </div>
+
+  <!-- B3: Quiz -->
+  <div id="l3-b3-quiz" class="l3-wrap hidden">
+    <button class="back-btn" onclick="closeMetric()">← ₹300 per Activation &amp; Recharge</button>
+    <div class="l3-pills">
+      <span class="pill pill-belief">Belief 3 · ₹300 Earnings</span>
+      <span class="pill pill-leading">Leading</span>
+      <span class="pill pill-waiting">Awaiting</span>
+    </div>
+    <div class="l3-name">Quiz pass rate</div>
+    <div class="l3-value dim">—</div>
+    <div class="l3-value-sub">Quiz module not yet deployed to all partners</div>
+    <div class="l3-divider"></div>
+    <div class="l3-field"><div class="l3-field-label">Target</div><div class="l3-field-text">≥70% pass rate · 1 question, pass/fail</div></div>
+    <div class="l3-field"><div class="l3-field-label">Question framing</div><div class="l3-field-text">Tests whether partner understands earnings are triggered by both activation AND each recharge — not just initial activation</div></div>
+    <div class="l3-field"><div class="l3-field-label">Source</div><div class="l3-field-text">In-app quiz module · CleverTap event: quiz_passed</div></div>
+  </div>
+
+  <!-- B3: Dipstick -->
+  <div id="l3-b3-dipstick" class="l3-wrap hidden">
+    <button class="back-btn" onclick="closeMetric()">← ₹300 per Activation &amp; Recharge</button>
+    <div class="l3-pills">
+      <span class="pill pill-belief">Belief 3 · ₹300 Earnings</span>
+      <span class="pill pill-leading">Leading</span>
+      <span class="pill pill-pending">Pending</span>
+    </div>
+    <div class="l3-name">Dipstick study — Day 14</div>
+    <div class="l3-value dim">Not started</div>
+    <div class="l3-value-sub">Due ~27 May 2026</div>
+    <div class="l3-divider"></div>
+    <div class="l3-field"><div class="l3-field-label">Recall check</div><div class="l3-field-text">Can partner explain unprompted: (1) they earn on activation, (2) they also earn on every customer recharge, (3) both are ₹300</div></div>
+    <div class="l3-field"><div class="l3-field-label">Source</div><div class="l3-field-text">Manual PTL dipstick · 50–60 calls · Ops team</div></div>
+  </div>
+
+  <!-- B4: CSP confusion calls -->
+  <div id="l3-b4-calls" class="l3-wrap hidden">
+    <button class="back-btn" onclick="closeMetric()">← ₹50 Auto-Credit per Pickup</button>
+    <div class="l3-pills">
+      <span class="pill pill-belief">Belief 4 · ₹50 Pickup</span>
+      <span class="pill pill-leading">Leading</span>
+      <span class="pill pill-live">Live</span>
+    </div>
+    <div class="l3-name">CSP confusion calls — ₹50 pickup credit</div>
+    <div class="l3-value"><!-- VAL:b4-calls -->0<!-- /VAL:b4-calls --></div>
+    <div class="l3-value-sub"><!-- SUB:b4-calls -->0 of 139 partner calls on 13 May flagged<!-- /SUB:b4-calls --></div>
+    <div class="l3-dod">
+    <!-- DOD:b4-calls -->
+    <div class="l3-dod-label">Day-over-day · Rolling 14 days · * pre-launch</div>
+      <table class="l3-dod-table">
+        <thead><tr><th>Fri 1*</th><th>Sat 2*</th><th>Sun 3*</th><th>Mon 4*</th><th>Wed 6*</th><th>Thu 7*</th><th>Fri 8*</th><th>Sat 9*</th><th>Sun 10*</th><th>Mon 11*</th><th>Tue 12*</th><th>Wed 13</th><th>Thu 14</th></tr></thead>
+        <tbody>
+          <tr><td>0</td><td><span class="trend-flat">→</span> 0</td><td><span class="trend-flat">→</span> 0</td><td><span class="trend-flat">→</span> 0</td><td><span class="trend-flat">→</span> 0</td><td><span class="trend-flat">→</span> 0</td><td><span class="trend-flat">→</span> 0</td><td><span class="trend-flat">→</span> 0</td><td><span class="trend-flat">→</span> 0</td><td><span class="trend-flat">→</span> 0</td><td><span class="trend-flat">→</span> 0</td><td><span class="trend-flat">→</span> 0</td><td class="pend">Pending</td></tr>
+          <tr><td class="sub">146 calls</td><td class="sub">115 calls</td><td class="sub">108 calls</td><td class="sub">100 calls</td><td class="sub">119 calls</td><td class="sub">141 calls</td><td class="sub">93 calls</td><td class="sub">111 calls</td><td class="sub">96 calls</td><td class="sub">115 calls</td><td class="sub">141 calls</td><td class="sub">139 calls</td><td class="sub">—</td></tr>
+        </tbody>
+      </table>
+    <!-- /DOD:b4-calls -->
+  </div>
+    <div class="l3-divider"></div>
+    <div class="l3-field"><div class="l3-field-label">Target</div><div class="l3-field-text">Zero calls asking how to "claim" the ₹50 — it's automatic. Any such calls indicate the belief hasn't landed.</div></div>
+    <div class="l3-field"><div class="l3-field-label">Signal logic</div><div class="l3-field-text">Topic: (50 / pachaas / पचास) + (netbox / pickup / collection) · AND confusion signal: क्यों / nahi aaya / samajh nahi / galat / problem / issue</div></div>
+    <div class="l3-field"><div class="l3-field-label">Source</div><div class="l3-field-text"><a href="https://metabase.wiom.in/question/11143" target="_blank">Metabase #11143</a> · <code>CX_CALL_AUDIT_ANALYSIS_PROD_V1</code> · Last run: 13 May 2026</div></div>
+  </div>
+
+  <!-- B4: Quiz -->
+  <div id="l3-b4-quiz" class="l3-wrap hidden">
+    <button class="back-btn" onclick="closeMetric()">← ₹50 Auto-Credit per Pickup</button>
+    <div class="l3-pills">
+      <span class="pill pill-belief">Belief 4 · ₹50 Pickup</span>
+      <span class="pill pill-leading">Leading</span>
+      <span class="pill pill-waiting">Awaiting</span>
+    </div>
+    <div class="l3-name">Quiz pass rate</div>
+    <div class="l3-value dim">—</div>
+    <div class="l3-value-sub">Quiz module not yet deployed to all partners</div>
+    <div class="l3-divider"></div>
+    <div class="l3-field"><div class="l3-field-label">Target</div><div class="l3-field-text">≥70% pass rate · 1 question, pass/fail</div></div>
+    <div class="l3-field"><div class="l3-field-label">Question framing</div><div class="l3-field-text">Tests whether partner knows the ₹50 is automatic on every pickup — no action, form, or claim needed</div></div>
+    <div class="l3-field"><div class="l3-field-label">Source</div><div class="l3-field-text">In-app quiz module · CleverTap event: quiz_passed</div></div>
+  </div>
+
+  <!-- B4: Dipstick -->
+  <div id="l3-b4-dipstick" class="l3-wrap hidden">
+    <button class="back-btn" onclick="closeMetric()">← ₹50 Auto-Credit per Pickup</button>
+    <div class="l3-pills">
+      <span class="pill pill-belief">Belief 4 · ₹50 Pickup</span>
+      <span class="pill pill-leading">Leading</span>
+      <span class="pill pill-pending">Pending</span>
+    </div>
+    <div class="l3-name">Dipstick study — Day 14</div>
+    <div class="l3-value dim">Not started</div>
+    <div class="l3-value-sub">Due ~27 May 2026</div>
+    <div class="l3-divider"></div>
+    <div class="l3-field"><div class="l3-field-label">Recall check</div><div class="l3-field-text">Can partner explain: (1) ₹50 credited per pickup, (2) it happens automatically — no claim needed, (3) it applies to every collection not just the first</div></div>
+    <div class="l3-field"><div class="l3-field-label">Source</div><div class="l3-field-text">Manual PTL dipstick · 50–60 calls · Ops team</div></div>
+  </div>
+
+  <!-- B4: Pickup completion rate -->
+  <div id="l3-b4-pickup" class="l3-wrap hidden">
+    <button class="back-btn" onclick="closeMetric()">← ₹50 Auto-Credit per Pickup</button>
+    <div class="l3-pills">
+      <span class="pill pill-belief">Belief 4 · ₹50 Pickup</span>
+      <span class="pill pill-lagging">Lagging</span>
+      <span class="pill pill-pending">Pending</span>
+    </div>
+    <div class="l3-name">Pickup completion rate over time</div>
+    <div class="l3-value dim">Not started</div>
+    <div class="l3-value-sub">% of assigned pickup tasks completed within SLA, trended weekly</div>
+    <div class="l3-divider"></div>
+    <div class="l3-field"><div class="l3-field-label">What it measures</div><div class="l3-field-text">Partners who understand the ₹50 incentive should show higher pickup SLA adherence. Rising completion rate over the first 4 weeks indicates the belief has changed behaviour.</div></div>
+    <div class="l3-field"><div class="l3-field-label">Source</div><div class="l3-field-text"><code>taskvanilla_audit</code> (NOTIF_SENT = dispatched, completion events) + <code>service_ticket_model</code> (ticket_type_final=1) via <code>HIERARCHY_BASE</code></div></div>
+  </div>
+
+  <!-- B5: CSP confusion calls -->
+  <div id="l3-b5-calls" class="l3-wrap hidden">
+    <button class="back-btn" onclick="closeMetric()">← Quality Score</button>
+    <div class="l3-pills">
+      <span class="pill pill-belief">Belief 5 · Quality Score</span>
+      <span class="pill pill-leading">Leading</span>
+      <span class="pill pill-live">Live</span>
+    </div>
+    <div class="l3-name">CSP confusion calls — quality score &amp; bonus</div>
+    <div class="l3-value"><!-- VAL:b5-calls -->0<!-- /VAL:b5-calls --></div>
+    <div class="l3-value-sub"><!-- SUB:b5-calls -->0 of 139 partner calls on 13 May flagged<!-- /SUB:b5-calls --></div>
+    <div class="l3-dod">
+    <!-- DOD:b5-calls -->
+    <div class="l3-dod-label">Day-over-day · Rolling 14 days · * pre-launch</div>
+      <table class="l3-dod-table">
+        <thead><tr><th>Fri 1*</th><th>Sat 2*</th><th>Sun 3*</th><th>Mon 4*</th><th>Wed 6*</th><th>Thu 7*</th><th>Fri 8*</th><th>Sat 9*</th><th>Sun 10*</th><th>Mon 11*</th><th>Tue 12*</th><th>Wed 13</th><th>Thu 14</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td><span class="trend-down">↓</span> 0</td><td><span class="trend-flat">→</span> 0</td><td><span class="trend-flat">→</span> 0</td><td><span class="trend-flat">→</span> 0</td><td><span class="trend-flat">→</span> 0</td><td><span class="trend-flat">→</span> 0</td><td><span class="trend-up">↑</span> 2</td><td><span class="trend-down">↓</span> 0</td><td><span class="trend-flat">→</span> 0</td><td><span class="trend-flat">→</span> 0</td><td><span class="trend-flat">→</span> 0</td><td class="pend">Pending</td></tr>
+          <tr><td class="sub">146 calls</td><td class="sub">115 calls</td><td class="sub">108 calls</td><td class="sub">100 calls</td><td class="sub">119 calls</td><td class="sub">141 calls</td><td class="sub">93 calls</td><td class="sub">111 calls</td><td class="sub">96 calls</td><td class="sub">115 calls</td><td class="sub">141 calls</td><td class="sub">139 calls</td><td class="sub">—</td></tr>
+        </tbody>
+      </table>
+    <!-- /DOD:b5-calls -->
+  </div>
+    <div class="l3-divider"></div>
+    <div class="l3-field"><div class="l3-field-label">Target</div><div class="l3-field-text">Zero or near-zero. Watch for rising calls in weeks 2–4 as partners start seeing quality-linked bonus variations.</div></div>
+    <div class="l3-field"><div class="l3-field-label">Signal logic</div><div class="l3-field-text">Topic: "quality score" / (quality + bonus) / (120 + bonus) / "lead nahi" / काम नहीं · AND confusion signal: क्यों / nahi aaya / samajh nahi / galat / problem / issue</div></div>
+    <div class="l3-field"><div class="l3-field-label">Source</div><div class="l3-field-text"><a href="https://metabase.wiom.in/question/11143" target="_blank">Metabase #11143</a> · <code>CX_CALL_AUDIT_ANALYSIS_PROD_V1</code> · Last run: 13 May 2026</div></div>
+  </div>
+
+  <!-- B5: Quiz -->
+  <div id="l3-b5-quiz" class="l3-wrap hidden">
+    <button class="back-btn" onclick="closeMetric()">← Quality Score</button>
+    <div class="l3-pills">
+      <span class="pill pill-belief">Belief 5 · Quality Score</span>
+      <span class="pill pill-leading">Leading</span>
+      <span class="pill pill-waiting">Awaiting</span>
+    </div>
+    <div class="l3-name">Quiz pass rate</div>
+    <div class="l3-value dim">—</div>
+    <div class="l3-value-sub">Quiz module not yet deployed to all partners</div>
+    <div class="l3-divider"></div>
+    <div class="l3-field"><div class="l3-field-label">Target</div><div class="l3-field-text">≥70% pass rate · 1 question, pass/fail</div></div>
+    <div class="l3-field"><div class="l3-field-label">Question framing</div><div class="l3-field-text">Tests whether partner understands that both the ₹120 bonus and lead volume are tied to quality score — not seniority, area, or fixed allocation</div></div>
+    <div class="l3-field"><div class="l3-field-label">Source</div><div class="l3-field-text">In-app quiz module · CleverTap event: quiz_passed</div></div>
+  </div>
+
+  <!-- B5: Dipstick -->
+  <div id="l3-b5-dipstick" class="l3-wrap hidden">
+    <button class="back-btn" onclick="closeMetric()">← Quality Score</button>
+    <div class="l3-pills">
+      <span class="pill pill-belief">Belief 5 · Quality Score</span>
+      <span class="pill pill-leading">Leading</span>
+      <span class="pill pill-pending">Pending</span>
+    </div>
+    <div class="l3-name">Dipstick study — Day 14</div>
+    <div class="l3-value dim">Not started</div>
+    <div class="l3-value-sub">Due ~27 May 2026</div>
+    <div class="l3-divider"></div>
+    <div class="l3-field"><div class="l3-field-label">Recall check</div><div class="l3-field-text">Can partner explain: (1) what quality score is, (2) that the ₹120 bonus depends on it, (3) that lead volume is also affected</div></div>
+    <div class="l3-field"><div class="l3-field-label">Source</div><div class="l3-field-text">Manual PTL dipstick · 50–60 calls · Ops team</div></div>
+  </div>
+
+  <!-- B5: Low quality score call rate -->
+  <div id="l3-b5-lowqs" class="l3-wrap hidden">
+    <button class="back-btn" onclick="closeMetric()">← Quality Score</button>
+    <div class="l3-pills">
+      <span class="pill pill-belief">Belief 5 · Quality Score</span>
+      <span class="pill pill-leading">Leading</span>
+      <span class="pill pill-pending">Pending</span>
+    </div>
+    <div class="l3-name">Low quality score partner call rate</div>
+    <div class="l3-value dim">Not started</div>
+    <div class="l3-value-sub">CSP calls about insufficient leads or bonus, from partners with quality score &lt;50</div>
+    <div class="l3-divider"></div>
+    <div class="l3-field"><div class="l3-field-label">What it measures</div><div class="l3-field-text">Partners with low quality scores who call about low leads or bonus clearly haven't connected score to outcomes. This cohort is the highest-risk group for belief gap.</div></div>
+    <div class="l3-field"><div class="l3-field-label">Source</div><div class="l3-field-text">Metabase #11143 joined to quality score table via partner ID · Quality measurement model not yet live</div></div>
+    <div class="l3-gap"><strong>Blocked:</strong> Quality measurement model not yet live. This metric can be built once partner quality scores are available in Snowflake.</div>
+  </div>
+
+  <!-- B5: Task acceptance rate -->
+  <div id="l3-b5-task" class="l3-wrap hidden">
+    <button class="back-btn" onclick="closeMetric()">← Quality Score</button>
+    <div class="l3-pills">
+      <span class="pill pill-belief">Belief 5 · Quality Score</span>
+      <span class="pill pill-lagging">Lagging</span>
+      <span class="pill pill-live">Live</span>
+    </div>
+    <div class="l3-name">Task acceptance rate</div>
+    <div class="l3-value">86.1%</div>
+    <div class="l3-value-sub">May 13 · 433 dispatched, 60 declined</div>
+    <div class="l3-dod">
+      <div class="l3-dod-label">Day-over-day · This week</div>
+      <table class="l3-dod-table">
+        <thead><tr><th>Mon 11</th><th>Tue 12</th><th>Wed 13</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>85.8%</td>
+            <td><span class="trend-down">↓</span> 80.7%</td>
+            <td><span class="trend-up">↑</span> 86.1%</td>
+          </tr>
+          <tr>
+            <td class="sub">409 dispatched</td>
+            <td class="sub">336 dispatched</td>
+            <td class="sub">433 dispatched</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="l3-divider"></div>
+    <div class="l3-field"><div class="l3-field-label">What it measures</div><div class="l3-field-text">Partners who understand quality score drives future work volume should accept more tasks. Rising acceptance rate over weeks 2–4 is the signal to watch.</div></div>
+    <div class="l3-field"><div class="l3-field-label">Source</div><div class="l3-field-text"><code>taskvanilla_audit</code> (NOTIF_SENT vs DECLINED events) via <code>HIERARCHY_BASE</code></div></div>
+    <div class="l3-note">Tuesday dip (80.7%) coincides with lower dispatch volume (336 vs 400+). Likely day-of-week effect, not a trend break.</div>
+  </div>
+
+  <!-- B5: Bonus trajectory -->
+  <div id="l3-b5-bonus" class="l3-wrap hidden">
+    <button class="back-btn" onclick="closeMetric()">← Quality Score</button>
+    <div class="l3-pills">
+      <span class="pill pill-belief">Belief 5 · Quality Score</span>
+      <span class="pill pill-lagging">Lagging</span>
+      <span class="pill pill-live">Live</span>
+    </div>
+    <div class="l3-name">Bonus trajectory — partners earning</div>
+    <div class="l3-value">684</div>
+    <div class="l3-value-sub">Partners with commission credited on May 13 · Avg ₹17,402 per partner</div>
+    <div class="l3-dod">
+      <div class="l3-dod-label">Day-over-day · This week</div>
+      <table class="l3-dod-table">
+        <thead><tr><th>Mon 11</th><th>Tue 12</th><th>Wed 13</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>743</td>
+            <td><span class="trend-up">↑</span> 753</td>
+            <td><span class="trend-down">↓</span> 684</td>
+          </tr>
+          <tr>
+            <td class="sub">₹18,073 avg</td>
+            <td class="sub">₹16,937 avg</td>
+            <td class="sub">₹17,402 avg</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="l3-divider"></div>
+    <div class="l3-field"><div class="l3-field-label">What it measures</div><div class="l3-field-text">Count of partners receiving commission each day. The quality-linked ₹120 bonus becomes meaningful from ~Day 14 when protection period ends. Watch for divergence between high-quality and low-quality partner earnings from that point.</div></div>
+    <div class="l3-field"><div class="l3-field-label">Source</div><div class="l3-field-text"><code>t_account_balance_sheet1</code> (action='COMMISSION_ADDED') · Note: verify whether <code>balance</code> field = transaction delta or running balance</div></div>
+  </div>
+
+  <!-- B5: Repeat work allocation -->
+  <div id="l3-b5-work" class="l3-wrap hidden">
+    <button class="back-btn" onclick="closeMetric()">← Quality Score</button>
+    <div class="l3-pills">
+      <span class="pill pill-belief">Belief 5 · Quality Score</span>
+      <span class="pill pill-lagging">Lagging</span>
+      <span class="pill pill-live">Live</span>
+    </div>
+    <div class="l3-name">Repeat work allocation</div>
+    <div class="l3-value">199 <span style="font-size:24px;font-weight:500;color:var(--muted);">partners</span></div>
+    <div class="l3-value-sub">May 13 · 433 total dispatches · 2.2 tasks per active partner</div>
+    <div class="l3-dod">
+      <div class="l3-dod-label">Day-over-day · This week</div>
+      <table class="l3-dod-table">
+        <thead><tr><th>Mon 11</th><th>Tue 12</th><th>Wed 13</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>206</td>
+            <td><span class="trend-down">↓</span> 197</td>
+            <td><span class="trend-flat">→</span> 199</td>
+          </tr>
+          <tr>
+            <td class="sub">2.0 tasks avg</td>
+            <td class="sub">1.7 tasks avg</td>
+            <td class="sub">2.2 tasks avg</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="l3-divider"></div>
+    <div class="l3-field"><div class="l3-field-label">What it measures</div><div class="l3-field-text">Partners who understand quality score drives lead volume should try to maintain score to keep receiving work. The meaningful read here is divergence: high-quality partners receiving more tasks than low-quality ones.</div></div>
+    <div class="l3-field"><div class="l3-field-label">Source</div><div class="l3-field-text"><code>taskvanilla_audit</code> (NOTIF_SENT per partner per day) via <code>HIERARCHY_BASE</code></div></div>
+    <div class="l3-note">Quality score model not yet live — repeat allocation not yet split by score. First meaningful read ~June when protection period ends.</div>
+  </div>
+
+</div><!-- end tab-beliefs -->
+
+
+<!-- ══════════════════════════════════════════
+     TAB 2 — PARTNER CALL ANALYSIS
+══════════════════════════════════════════ -->
+<div id="tab-dod" class="tab-panel">
+<div class="dod-main">
+
+  <div class="dod-header-row">
+    <div class="stat-card">
+      <div class="stat-label">Partner calls today</div>
+      <div class="stat-value">139</div>
+      <div class="stat-sub">13 May 2026 — Go-live Day 1</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Belief break signals</div>
+      <div class="stat-value pink">5</div>
+      <div class="stat-sub">3.6% of calls — 4 withdrawal (app UX) + 1 quality score</div>
+    </div>
+  </div>
+
+  <div class="dod-section">
+    <div class="dod-section-header"><h3>Confusion Call Matrix</h3><span>5 beliefs · Rolling 14 days · * pre-launch</span></div>
+    <div class="dod-section-body">
+<!-- MATRIX:calls -->
+<div class="matrix-wrap">
+      <table class="matrix-table">
+        <thead><tr><th class="matrix-belief-col">Belief</th><th>1 May*</th><th>2 May*</th><th>3 May*</th><th>4 May*</th><th>6 May*</th><th>7 May*</th><th>8 May*</th><th>9 May*</th><th>10 May*</th><th>11 May*</th><th>12 May*</th><th>13 May</th><th>14 May</th></tr></thead>
+        <tbody><tr><td class="matrix-belief-label">B1 · Carry fee</td><td class="matrix-zero">0</td><td class="matrix-zero">0</td><td class="matrix-zero">0</td><td class="matrix-zero">0</td><td class="matrix-zero">0</td><td class="matrix-zero">0</td><td class="matrix-zero">0</td><td class="matrix-zero">0</td><td class="matrix-zero">0</td><td class="matrix-zero">0</td><td class="matrix-zero">0</td><td class="matrix-zero">0</td><td class="matrix-pend">—</td></tr><tr><td class="matrix-belief-label">B2 · Withdrawal timing</td><td class="matrix-zero">0</td><td class="matrix-zero">0</td><td class="matrix-zero">0</td><td class="matrix-zero">0</td><td class="matrix-zero">0</td><td class="matrix-zero">0</td><td class="matrix-zero">0</td><td class="matrix-zero">0</td><td class="matrix-zero">0</td><td class="matrix-zero">0</td><td class="matrix-zero">0</td><td class="matrix-zero">0</td><td class="matrix-pend">—</td></tr><tr><td class="matrix-belief-label">B3 · ₹300 earnings</td><td class="matrix-zero">0</td><td class="matrix-zero">0</td><td class="matrix-zero">0</td><td class="matrix-zero">0</td><td class="matrix-zero">0</td><td class="matrix-zero">0</td><td class="matrix-zero">0</td><td class="matrix-zero">0</td><td class="matrix-zero">0</td><td class="matrix-zero">0</td><td class="matrix-zero">0</td><td class="matrix-zero">0</td><td class="matrix-pend">—</td></tr><tr><td class="matrix-belief-label">B4 · ₹50 pickup credit</td><td class="matrix-zero">0</td><td class="matrix-zero">0</td><td class="matrix-zero">0</td><td class="matrix-zero">0</td><td class="matrix-zero">0</td><td class="matrix-zero">0</td><td class="matrix-zero">0</td><td class="matrix-zero">0</td><td class="matrix-zero">0</td><td class="matrix-zero">0</td><td class="matrix-zero">0</td><td class="matrix-zero">0</td><td class="matrix-pend">—</td></tr><tr><td class="matrix-belief-label">B5 · Quality &amp; bonus</td><td class="matrix-hit" data-v='["…करनी है कई पॉइंट उसके भी है मेरे को जो लगे वो भी मेरे को शेयर करना है प्लस आज का मेरा इंसेंटिव नहीं आया रेटिंग बोनस द डिवाइस बोनस तो उसके रिगार्डिंग भी बात करनी है क्योंकि उस एप में ऐसा कहीं ऑप्शन ही नहीं है रेटिंग और\nठीक है…"]' data-hdr="B5 · Quality & bonus · 1 May · 1 call">1</td><td class="matrix-zero">0</td><td class="matrix-zero">0</td><td class="matrix-zero">0</td><td class="matrix-zero">0</td><td class="matrix-zero">0</td><td class="matrix-zero">0</td><td class="matrix-hit" data-v='["…से बात करेंगे सर आप\nहाँ जी हाँ जी\nआप बताए सर कि आपको मतलब कब से लीड नहीं आ रही है\nबहुत टाइम लग गल\nबट सर इसके लिए मैं ये कहना चाहता हूँ की लीड से रिलेट…", "…[11.5-15.9]: भाई जी ये एक बात पूछना चाहते क्योंकि लीट वगैरह क्यों नहीं आ रही है हम\nआपका कहने की लीड नहीं आ रही आपके पास\nलीड वगैरा आई नहीं वगैरह थी\nजी जी मैं बताना चाहता हूँ आपको लीड…"]' data-hdr="B5 · Quality & bonus · 9 May · 2 calls">2</td><td class="matrix-zero">0</td><td class="matrix-zero">0</td><td class="matrix-zero">0</td><td class="matrix-zero">0</td><td class="matrix-pend">—</td></tr><tr class="matrix-total"><td class="matrix-belief-label">Total</td><td class="matrix-hit">1</td><td class="matrix-zero">0</td><td class="matrix-zero">0</td><td class="matrix-zero">0</td><td class="matrix-zero">0</td><td class="matrix-zero">0</td><td class="matrix-zero">0</td><td class="matrix-hit">2</td><td class="matrix-zero">0</td><td class="matrix-zero">0</td><td class="matrix-zero">0</td><td class="matrix-zero">0</td><td class="matrix-pend">—</td></tr></tbody>
+      </table>
+    </div>
+    <div class="matrix-pre-note">* Pre-launch days shown as baseline. 5 May absent from call data.</div>
+<!-- /MATRIX:calls -->
+    </div>
+  </div>
+
+  <div class="dod-section">
+    <div class="dod-section-header"><h3>What Partners Are Calling About</h3><span>Transcript analysis · 13 May 2026</span></div>
+    <div class="dod-section-body">
+      <div class="insight-grid">
+        <div class="insight-box flagged">
+          <div class="ib-label">Belief break signal</div>
+          <div class="ib-title">Wallet missing after app update</div>
+          <div class="ib-count">4 calls · 2.9%</div>
+          <div class="ib-desc">Partners cannot find or access their wallet in the new app. Unable to see balance or initiate bank transfer. All 4 calls same root cause — likely a UX regression, not rule confusion.</div>
+        </div>
+        <div class="insight-box flagged">
+          <div class="ib-label">Belief break signal</div>
+          <div class="ib-title">Quality score / bonus confusion</div>
+          <div class="ib-count">1 call · 0.7%</div>
+          <div class="ib-desc">Partner flagged for quality + bonus confusion language. Single call on day 1 — monitor for whether this rises in week 2 when first quality-linked bonus variations appear.</div>
+        </div>
+        <div class="insight-box context">
+          <div class="ib-label">Operational</div>
+          <div class="ib-title">Installation &amp; device issues</div>
+          <div class="ib-count">Est. ~30–35 calls</div>
+          <div class="ib-desc">Router not connecting, ISP ID upload option missing during install, demo device not activating, WiFi signal dropping. Standard operational support.</div>
+        </div>
+        <div class="insight-box context">
+          <div class="ib-label">Operational</div>
+          <div class="ib-title">App / portal navigation</div>
+          <div class="ib-count">Est. ~25–30 calls</div>
+          <div class="ib-desc">Partners navigating the new app — finding transaction history, adding team members, admin rights not syncing. New app layout generating orientation questions.</div>
+        </div>
+        <div class="insight-box context">
+          <div class="ib-label">Operational</div>
+          <div class="ib-title">Customer recharge &amp; complaint status</div>
+          <div class="ib-count">Est. ~20–25 calls</div>
+          <div class="ib-desc">Recharge not reflecting in portal, complaint status follow-ups, SLA breach escalations. Routine support — no new system confusion evident.</div>
+        </div>
+        <div class="insight-box context">
+          <div class="ib-label">Context</div>
+          <div class="ib-title">No carry fee, ₹300, or ₹50 confusion</div>
+          <div class="ib-count">0 flagged calls</div>
+          <div class="ib-desc">No calls flagged for carry fee, ₹300 earnings, or ₹50 pickup credit confusion on day 1.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dod-section">
+    <div class="dod-section-header"><h3>Verbatims — Flagged Calls</h3><span>4 calls · Withdrawal · 13 May 2026</span></div>
+    <div class="dod-section-body">
+      <div class="verbatim-list">
+        <div class="verbatim">
+          <div class="verbatim-meta"><span class="vm-tag vm-belief">Withdrawal Timing</span><span class="vm-tag vm-disp">Already Resolved</span><span class="vm-date">13 May 2026 · Call #1</span></div>
+          <div class="verbatim-body">
+            <div class="vb-label">Partner (Hindi)</div>
+            <div class="vb-hindi">"जो हमारा फस्टोबर के रिचार्ज आते हैं, ऑनलाइन जी, उसकी डिटेल्स... पहले वॉलेट में सो रहता है ना — कहाँ देखें अब?"</div>
+            <div class="vb-label" style="margin-top:10px;">Context</div>
+            <div class="vb-translation">Partner asking how to find wallet payment history in the new app. Agent walked through the three-line menu. Resolved on-call — orientation to new app layout, not withdrawal rule confusion.</div>
+          </div>
+        </div>
+        <div class="verbatim">
+          <div class="verbatim-meta"><span class="vm-tag vm-belief">Withdrawal Timing</span><span class="vm-tag vm-disp">Shared with Partner</span><span class="vm-date">13 May 2026 · Call #2</span></div>
+          <div class="verbatim-body">
+            <div class="vb-label">Partner (Hindi)</div>
+            <div class="vb-hindi">"ऐप में पैसे डाल निकाल नहीं सकता — वॉलेट का ऑप्शन आ ही नहीं रहा, चार पाँच दिन से।"</div>
+            <div class="vb-label" style="margin-top:10px;">Context</div>
+            <div class="vb-translation">"Can't deposit or withdraw in the app — wallet option simply isn't showing, for 4–5 days." Ticket raised. Wallet menu disappeared after app update.</div>
+          </div>
+        </div>
+        <div class="verbatim">
+          <div class="verbatim-meta"><span class="vm-tag vm-belief">Withdrawal Timing</span><span class="vm-tag vm-disp">Shared with Partner</span><span class="vm-date">13 May 2026 · Call #3</span></div>
+          <div class="verbatim-body">
+            <div class="vb-label">Partner (Hindi)</div>
+            <div class="vb-hindi">"ट्रांजेक्शन में देख रहा हूँ तो खाली आठ की डिटेल आ रही है — ना कल की, ना परसों की। पिछली सारी हिस्ट्री रीसेट हो रही है।"</div>
+            <div class="vb-label" style="margin-top:10px;">Context</div>
+            <div class="vb-translation">"In transactions I can only see today's data — nothing from yesterday or the day before. All previous history is resetting." Transaction history not loading after app update.</div>
+          </div>
+        </div>
+        <div class="verbatim">
+          <div class="verbatim-meta"><span class="vm-tag vm-belief">Withdrawal Timing</span><span class="vm-tag vm-disp">Already Resolved</span><span class="vm-date">13 May 2026 · Call #4</span></div>
+          <div class="verbatim-body">
+            <div class="vb-label">Partner (Hindi)</div>
+            <div class="vb-hindi">"वॉलेट जो रहता है जिसमें पैसे दिखते थे — वो निकल गया है। साढ़े चार हजार था अंदर, ऐप अपडेट होने के बाद में गायब हो गया।"</div>
+            <div class="vb-label" style="margin-top:10px;">Context</div>
+            <div class="vb-translation">"The wallet where my money used to show has disappeared. I had around ₹4,500 in it — vanished after the app update." Partner concerned about balance visibility after new app rollout.</div>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:16px;padding:14px 16px;background:var(--pending-bg);border:1px solid var(--border);border-radius:8px;font-size:12px;color:var(--mid);line-height:1.6;">
+        <strong style="color:var(--dark);">Pattern note:</strong> All 4 flagged calls share a single root cause — wallet section inaccessible after app update. This is an <strong>app UX issue</strong>, not confusion about withdrawal timing rules. Recommend checking with product whether wallet menu location changed and whether a fix is in progress.
+      </div>
+    </div>
+  </div>
+
+</div>
+</div><!-- end tab-dod -->
+
+<footer>
+  Wiom · CSP Migration · Belief Break Clarity Dashboard · Built May 2026 ·
+  CSP call data: <a href="https://metabase.wiom.in/question/11143" target="_blank" style="color:var(--pink);">Detail</a> &amp;
+  <a href="https://metabase.wiom.in/question/11144" target="_blank" style="color:var(--pink);">Summary</a> on Metabase
+</footer>
+
+<script>
+  let currentBelief = null;
+
+  function switchTab(name, btn) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    btn.classList.add('active');
+    document.getElementById('legend-bar').style.display = name === 'beliefs' ? '' : 'none';
+    if (name === 'beliefs') { closeBelief(); }
+  }
+
+  function openBelief(n) {
+    currentBelief = n;
+    document.getElementById('l1').classList.add('hidden');
+    document.querySelectorAll('[id^="l2-b"]').forEach(p => p.classList.add('hidden'));
+    document.querySelectorAll('[id^="l3-"]').forEach(p => p.classList.add('hidden'));
+    document.getElementById('l2-b' + n).classList.remove('hidden');
+    window.scrollTo(0, 0);
+  }
+
+  function closeBelief() {
+    currentBelief = null;
+    document.getElementById('l1').classList.remove('hidden');
+    document.querySelectorAll('[id^="l2-b"]').forEach(p => p.classList.add('hidden'));
+    document.querySelectorAll('[id^="l3-"]').forEach(p => p.classList.add('hidden'));
+    window.scrollTo(0, 0);
+  }
+
+  function openMetric(id) {
+    document.querySelectorAll('[id^="l2-b"]').forEach(p => p.classList.add('hidden'));
+    document.querySelectorAll('[id^="l3-"]').forEach(p => p.classList.add('hidden'));
+    document.getElementById('l3-' + id).classList.remove('hidden');
+    window.scrollTo(0, 0);
+  }
+
+  function closeMetric() {
+    document.querySelectorAll('[id^="l3-"]').forEach(p => p.classList.add('hidden'));
+    if (currentBelief) {
+      document.getElementById('l2-b' + currentBelief).classList.remove('hidden');
+    }
+    window.scrollTo(0, 0);
+  }
+</script>
+
+<div id="mtt"></div>
+<script>
+(function () {
+  var tip = document.getElementById('mtt');
+
+  function pos(e) {
+    var pad = 16, tw = tip.offsetWidth || 400, th = tip.offsetHeight || 200;
+    var x = e.clientX + pad;
+    var y = e.clientY + pad;
+    if (x + tw > window.innerWidth  - 8) x = e.clientX - tw - pad;
+    if (y + th > window.innerHeight - 8) y = e.clientY - th - pad;
+    tip.style.left = x + 'px';
+    tip.style.top  = y + 'px';
+  }
+
+  function attach() {
+    document.querySelectorAll('td.matrix-hit').forEach(function (cell) {
+      cell.addEventListener('mouseenter', function (e) {
+        var hdr    = cell.dataset.hdr || '';
+        var raw    = cell.dataset.v   || '';
+        var items  = '';
+        if (raw) {
+          try {
+            var snips = JSON.parse(raw);
+            items = snips.map(function (s) {
+              return '<div class="mtt-item">' + s.replace(/</g, '&lt;') + '</div>';
+            }).join('');
+          } catch (_) {}
+        }
+        tip.innerHTML =
+          '<div class="mtt-hdr">' + hdr + '</div>' +
+          (items || '<div class="mtt-empty">Transcript not available</div>');
+        tip.style.display = 'block';
+        pos(e);
+      });
+      cell.addEventListener('mousemove', pos);
+      cell.addEventListener('mouseleave', function () {
+        tip.style.display = 'none';
+      });
+    });
+  }
+
+  // run now and re-attach after any matrix update (script injects new DOM)
+  attach();
+  var observer = new MutationObserver(attach);
+  var wrap = document.querySelector('.matrix-wrap');
+  if (wrap) observer.observe(wrap, { childList: true, subtree: true });
+})();
+</script>
+</body>
+</html>
