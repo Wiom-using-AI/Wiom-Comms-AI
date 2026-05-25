@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wiom — Category Contamination Review</title>
+  <link href="https://fonts.googleapis.com/css2?family=Hind:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --pink: #d1007e;
+      --pink-light: #fce8f3;
+      --pink-mid: #f472b6;
+      --text: #1a1a1a;
+      --text-muted: #555;
+      --bg: #ffffff;
+      --bg-gray: #f7f7f7;
+      --footer-bg: #1c1c1c;
+      --magenta: #c0008a;
+
+      --note-critical: #ef4444;
+      --note-high: #f97316;
+      --note-medium: #eab308;
+      --note-low: #3b82f6;
+      --note-ok: #22c55e;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Hind', 'Noto Sans Devanagari', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      position: relative;
+    }
+
+    /* ─── REVIEW TOOLBAR ─── */
+    #review-toolbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 9000;
+      background: #1a1a2e;
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 20px;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+    #review-toolbar .toolbar-title {
+      font-weight: 600;
+      margin-right: 10px;
+      color: #f472b6;
+      letter-spacing: 0.3px;
+    }
+    #review-toolbar button {
+      padding: 5px 12px;
+      border-radius: 5px;
+      border: 1px solid rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.08);
+      color: white;
+      cursor: pointer;
+      font-size: 12px;
+      font-family: 'Inter', sans-serif;
+      transition: background 0.15s;
+    }
+    #review-toolbar button:hover { background: rgba(255,255,255,0.18); }
+    #review-toolbar button.active { background: var(--pink); border-color: var(--pink); }
+    .toolbar-sep { width: 1px; height: 20px; background: rgba(255,255,255,0.2); margin: 0 4px; }
+    .legend { display: flex; gap: 8px; align-items: center; margin-left: auto; }
+    .legend-item { display: flex; align-items: center; gap: 4px; font-size: 11px; opacity: 0.85; }
+    .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+    #note-count { font-size: 11px; opacity: 0.6; margin-left: 4px; }
+
+    /* ─── ANNOTATION NOTES ─── */
+    .annotation-note {
+      position: absolute;
+      width: 260px;
+      background: #fffde7;
+      border-radius: 4px;
+      box-shadow: 2px 3px 12px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.06);
+      z-index: 8000;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      cursor: default;
+      transition: box-shadow 0.15s;
+    }
+    .annotation-note:hover { box-shadow: 3px 5px 18px rgba(0,0,0,0.25), 0 0 0 1px rgba(0,0,0,0.08); }
+    .annotation-note.minimized .note-body-wrap { display: none; }
+    .annotation-note.hidden-note { display: none; }
+
+    .note-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 8px;
+      border-radius: 4px 4px 0 0;
+      cursor: grab;
+      user-select: none;
+    }
+    .note-header:active { cursor: grabbing; }
+    .note-severity {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: white;
+      padding: 2px 6px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+    .note-ref {
+      font-size: 10px;
+      opacity: 0.7;
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .note-actions { display: flex; gap: 3px; flex-shrink: 0; }
+    .note-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      width: 18px; height: 18px;
+      border-radius: 3px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px;
+      opacity: 0.6;
+      transition: opacity 0.15s, background 0.15s;
+      color: #333;
+    }
+    .note-btn:hover { opacity: 1; background: rgba(0,0,0,0.1); }
+
+    .note-body-wrap { padding: 8px 10px 10px; }
+    .note-body {
+      width: 100%;
+      min-height: 70px;
+      border: none;
+      background: transparent;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      line-height: 1.55;
+      color: #333;
+      resize: vertical;
+      outline: none;
+      cursor: text;
+    }
+    .note-body:focus { background: rgba(0,0,0,0.03); border-radius: 3px; }
+    .note-footer {
+      padding: 0 10px 7px;
+      font-size: 10px;
+      color: #999;
+      font-style: italic;
+    }
+
+    /* severity colors */
+    .sev-critical .note-header { background: #fee2e2; }
+    .sev-critical .note-severity { background: var(--note-critical); }
+    .sev-high .note-header { background: #fff7ed; }
+    .sev-high .note-severity { background: var(--note-high); }
+    .sev-medium .note-header { background: #fefce8; }
+    .sev-medium .note-severity { background: var(--note-medium); color: #333; }
+    .sev-low .note-header { background: #eff6ff; }
+    .sev-low .note-severity { background: var(--note-low); }
+    .sev-ok .note-header { background: #f0fdf4; }
+    .sev-ok .note-severity { background: var(--note-ok); }
+
+    /* ─── WEBSITE CONTENT ─── */
+    #site-wrapper {
+      position: relative;
+      padding-top: 42px; /* toolbar height */
+    }
+
+    /* NAV */
+    .site-nav {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 48px;
+      background: white;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .nav-logo {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 20px; font-weight: 700; color: var(--text);
+    }
+    .nav-logo svg { width: 28px; height: 28px; }
+    .nav-phone {
+      font-size: 14px; color: var(--text-muted);
+      display: flex; align-items: center; gap: 6px;
+    }
+    .nav-phone svg { width: 14px; height: 14px; }
+
+    /* HERO */
+    .hero {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      padding: 72px 80px 80px 80px;
+      gap: 40px;
+      min-height: 540px;
+      background: white;
+    }
+    .hero-text h1 {
+      font-size: 56px;
+      font-weight: 700;
+      line-height: 1.1;
+      margin-bottom: 18px;
+    }
+    .hero-text h1 span { color: var(--pink); }
+    .hero-tagline {
+      font-size: 18px;
+      color: var(--text-muted);
+      margin-bottom: 32px;
+      font-weight: 400;
+    }
+    .hero-label {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+    .pincode-row {
+      display: flex; gap: 10px; align-items: center; margin-bottom: 10px;
+    }
+    .pincode-input {
+      padding: 12px 16px;
+      border: 1.5px solid #ddd;
+      border-radius: 8px;
+      font-size: 15px;
+      font-family: 'Hind', sans-serif;
+      width: 260px;
+      outline: none;
+    }
+    .pincode-input:focus { border-color: var(--pink); }
+    .btn-pink {
+      background: var(--pink);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 15px;
+      font-family: 'Hind', sans-serif;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-pink:hover { background: #b5006c; }
+    .hero-check-link {
+      font-size: 13px; color: var(--text-muted); margin-top: 4px;
+    }
+    .hero-image {
+      width: 100%;
+      border-radius: 16px;
+      overflow: hidden;
+      background: #f0e6d3;
+      height: 360px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .hero-image-placeholder {
+      width: 100%; height: 100%;
+      background: linear-gradient(135deg, #f5ede0 0%, #e8d5b7 100%);
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column; gap: 12px;
+      border-radius: 16px;
+      font-size: 14px; color: #999;
+      border: 1.5px dashed #ddd;
+    }
+    .hero-image-placeholder svg { width: 40px; height: 40px; opacity: 0.3; }
+    .how-link {
+      text-align: center;
+      padding: 28px;
+      font-size: 14px;
+      color: var(--text-muted);
+      background: white;
+      border-top: 1px solid #f5f5f5;
+    }
+
+    /* PAIN POINTS */
+    .pain-section {
+      position: relative;
+      padding: 80px 80px 64px;
+      background: var(--bg-gray);
+    }
+    .pain-section h2 {
+      font-size: 36px;
+      font-weight: 700;
+      margin-bottom: 24px;
+      line-height: 1.2;
+    }
+    .pain-list {
+      list-style: none;
+      margin-bottom: 40px;
+    }
+    .pain-list li {
+      font-size: 20px;
+      color: var(--text-muted);
+      padding: 8px 0;
+      border-bottom: 1px solid #eee;
+    }
+    .pain-list li:last-child { border-bottom: none; }
+    .pain-resolution {
+      font-size: 20px;
+      color: var(--text);
+      margin-top: 28px;
+      line-height: 1.5;
+    }
+    .pain-headline {
+      font-size: 32px;
+      font-weight: 700;
+      margin-top: 32px;
+      line-height: 1.2;
+    }
+    .pain-headline span { color: var(--pink); }
+
+    /* ANALOGY */
+    .analogy-section {
+      position: relative;
+      padding: 80px;
+      background: white;
+    }
+    .analogy-images {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-bottom: 36px;
+    }
+    .analogy-img-box {
+      height: 160px;
+      background: #f5f0e8;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 36px;
+    }
+    .analogy-lines {
+      list-style: none;
+      margin-bottom: 24px;
+    }
+    .analogy-lines li {
+      font-size: 20px;
+      color: var(--text-muted);
+      padding: 6px 0;
+    }
+    .analogy-question {
+      font-size: 36px;
+      font-weight: 700;
+    }
+
+    /* PROCESS */
+    .process-section {
+      position: relative;
+      padding: 80px;
+      background: var(--bg-gray);
+    }
+    .process-section h2 {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 40px;
+    }
+    .process-steps { display: flex; flex-direction: column; gap: 20px; max-width: 600px; }
+    .process-step {
+      display: flex; align-items: flex-start; gap: 16px;
+    }
+    .step-num {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--pink);
+      color: white;
+      font-weight: 700;
+      font-size: 16px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: 2px;
+    }
+    .step-text { font-size: 18px; line-height: 1.5; padding-top: 4px; }
+
+    /* HOW IT WORKS */
+    .how-section {
+      position: relative;
+      padding: 80px;
+      background: white;
+    }
+    .how-section h2 {
+      text-align: center;
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 48px;
+    }
+    .how-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    .how-card {
+      background: #fafafa;
+      border: 1px solid #f0f0f0;
+      border-radius: 12px;
+      padding: 32px 24px;
+      text-align: center;
+    }
+    .how-icon {
+      width: 56px; height: 56px;
+      background: var(--pink-light);
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 20px;
+      font-size: 24px;
+    }
+    .how-card p {
+      font-size: 17px;
+      color: var(--text);
+      line-height: 1.5;
+      font-weight: 500;
+    }
+
+    /* PRICING */
+    .pricing-section {
+      position: relative;
+      padding: 60px 80px;
+      background: white;
+      text-align: center;
+    }
+    .pricing-lead { font-size: 20px; color: var(--text-muted); margin-bottom: 28px; }
+    .pricing-lead strong { color: var(--pink); font-size: 26px; font-weight: 700; }
+    .price-cards {
+      display: inline-flex;
+      align-items: center;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    .price-card {
+      background: #f9f9f9;
+      border: 1.5px solid #ebebeb;
+      border-radius: 14px;
+      padding: 24px 36px;
+      min-width: 160px;
+    }
+    .price-amount {
+      font-size: 36px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .price-label {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+    .price-div { font-size: 24px; color: #ccc; }
+    .pricing-note { font-size: 16px; color: var(--text-muted); margin-top: 12px; }
+
+    /* CITIES */
+    .cities-section {
+      position: relative;
+      padding: 72px 80px;
+      background: linear-gradient(135deg, #c0008a 0%, #9b006e 100%);
+      color: white;
+      text-align: center;
+    }
+    .cities-section h2 { font-size: 28px; font-weight: 700; margin-bottom: 16px; }
+    .cities-list { font-size: 17px; opacity: 0.9; margin-bottom: 20px; line-height: 1.8; }
+    .cities-note { font-size: 14px; opacity: 0.7; }
+
+    /* FOOTER */
+    .site-footer {
+      position: relative;
+      background: var(--footer-bg);
+      color: white;
+      padding: 40px 80px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .footer-brand { display: flex; flex-direction: column; gap: 6px; }
+    .footer-logo { display: flex; align-items: center; gap: 8px; font-size: 18px; font-weight: 700; }
+    .footer-tagline { font-size: 14px; opacity: 0.6; }
+    .footer-contact { text-align: right; }
+    .footer-phone { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+    .footer-address { font-size: 13px; opacity: 0.5; line-height: 1.5; }
+
+    /* ─── ADD NOTE OVERLAY ─── */
+    #add-note-modal {
+      display: none;
+      position: fixed;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 9500;
+      background: white;
+      border-radius: 10px;
+      padding: 24px;
+      width: 380px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      font-family: 'Inter', sans-serif;
+    }
+    #add-note-modal h3 { font-size: 15px; margin-bottom: 16px; color: #1a1a1a; }
+    #add-note-modal label { display: block; font-size: 12px; color: #666; margin-bottom: 4px; margin-top: 12px; }
+    #add-note-modal select,
+    #add-note-modal input,
+    #add-note-modal textarea {
+      width: 100%; padding: 8px 10px;
+      border: 1.5px solid #e0e0e0; border-radius: 6px;
+      font-family: 'Inter', sans-serif; font-size: 13px;
+      outline: none;
+    }
+    #add-note-modal select:focus,
+    #add-note-modal input:focus,
+    #add-note-modal textarea:focus { border-color: var(--pink); }
+    #add-note-modal textarea { min-height: 80px; resize: vertical; }
+    #add-note-modal .modal-buttons {
+      display: flex; gap: 8px; margin-top: 16px; justify-content: flex-end;
+    }
+    #add-note-modal .modal-buttons button {
+      padding: 8px 18px; border-radius: 6px; border: none;
+      cursor: pointer; font-size: 13px; font-family: 'Inter', sans-serif;
+    }
+    .btn-cancel { background: #f0f0f0; color: #333; }
+    .btn-add { background: var(--pink); color: white; font-weight: 600; }
+    #modal-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.4);
+      z-index: 9400;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ─── REVIEW TOOLBAR ─── -->
+<div id="review-toolbar">
+  <span class="toolbar-title">📋 Contamination Review</span>
+  <button id="btn-toggle-notes" class="active" onclick="toggleNotes()">Hide Notes</button>
+  <button onclick="openAddModal()">+ Add Note</button>
+  <div class="toolbar-sep"></div>
+  <button onclick="exportNotes()">Export JSON</button>
+  <button onclick="triggerImport()">Import JSON</button>
+  <input type="file" id="import-file" accept=".json" style="display:none" onchange="importNotes(event)">
+  <div class="toolbar-sep"></div>
+  <button onclick="resetNotes()" style="color:#fca5a5;">Reset to Default</button>
+  <span id="note-count"></span>
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#ef4444"></div>Critical</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#f97316"></div>High</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#eab308"></div>Medium</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#3b82f6"></div>Low</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#22c55e"></div>OK</div>
+  </div>
+</div>
+
+<!-- ─── ADD NOTE MODAL ─── -->
+<div id="modal-overlay" onclick="closeAddModal()"></div>
+<div id="add-note-modal">
+  <h3>Add Annotation</h3>
+  <label>Severity</label>
+  <select id="modal-severity">
+    <option value="critical">Critical</option>
+    <option value="high" selected>High</option>
+    <option value="medium">Medium</option>
+    <option value="low">Low</option>
+    <option value="ok">OK / No issue</option>
+  </select>
+  <label>Document Reference (e.g. §5, Table 3)</label>
+  <input type="text" id="modal-ref" placeholder="§5, Table 3, §7E...">
+  <label>Note</label>
+  <textarea id="modal-body" placeholder="Describe the contamination or observation..."></textarea>
+  <div class="modal-buttons">
+    <button class="btn-cancel" onclick="closeAddModal()">Cancel</button>
+    <button class="btn-add" onclick="saveNewNote()">Add Note</button>
+  </div>
+</div>
+
+<!-- ─── SITE WRAPPER ─── -->
+<div id="site-wrapper">
+
+  <!-- NAVBAR -->
+  <section id="section-nav" class="site-nav" style="position:relative">
+    <div class="nav-logo">
+      <svg viewBox="0 0 32 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M4 10 C4 5, 10 2, 14 7 C16 10, 16 10, 18 7 C22 2, 28 5, 28 10 C28 15, 22 18, 18 13 C16 10, 16 10, 14 13 C10 18, 4 15, 4 10 Z" stroke="#d1007e" stroke-width="2.5" fill="none"/>
+      </svg>
+      Wiom
+    </div>
+    <div class="nav-phone">
+      <svg viewBox="0 0 16 16" fill="currentColor"><path d="M3.654 1.328a.678.678 0 0 0-1.015-.063L1.605 2.3c-.483.484-.661 1.169-.45 1.77a17.568 17.568 0 0 0 4.168 6.608 17.569 17.569 0 0 0 6.608 4.168c.601.211 1.286.033 1.77-.45l1.034-1.034a.678.678 0 0 0-.063-1.015l-2.307-1.794a.678.678 0 0 0-.58-.122l-2.19.547a1.745 1.745 0 0 1-1.657-.459L5.482 9.48a1.745 1.745 0 0 1-.46-1.657l.548-2.19a.678.678 0 0 0-.122-.58L3.654 1.328z"/></svg>
+      88803 22222
+    </div>
+  </section>
+
+  <!-- HERO -->
+  <section id="section-hero" class="hero" style="position:relative">
+    <div class="hero-text">
+      <h1>रिचार्ज वाला<br><span>घर का नेट</span></h1>
+      <p class="hero-tagline">जितने दिन रिचार्ज, उतने दिन नेट।</p>
+      <p class="hero-label">पहले अपना एरिया चेक करें</p>
+      <div class="pincode-row">
+        <input class="pincode-input" type="text" placeholder="पिनकोड डालें">
+        <button class="btn-pink">देखें</button>
+      </div>
+      <p class="hero-check-link">देखें आपके एरिया में है या नहीं</p>
+    </div>
+    <div class="hero-image">
+      <div class="hero-image-placeholder">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+        <span style="font-family:'Hind',sans-serif; font-size:13px">Indian family — home internet scene</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="how-link">समझें कैसे काम करता है ↓</div>
+
+  <!-- PAIN POINTS -->
+  <section id="section-pain" class="pain-section" style="position:relative">
+    <h2>इस महीने बजट थोड़ा टाइट है?</h2>
+    <ul class="pain-list">
+      <li>मोबाइल डेटा खत्म हो जाता है?</li>
+      <li>पूरे महीने की ज़रूरत नहीं?</li>
+    </ul>
+    <p class="pain-resolution">जब ज़रूरत हो तब ही नेट — जब नहीं, तो बंद।</p>
+    <p class="pain-headline">घर का नेट। <span>रिचार्ज से।</span></p>
+  </section>
+
+  <!-- ANALOGY -->
+  <section id="section-analogy" class="analogy-section" style="position:relative">
+    <div class="analogy-images">
+      <div class="analogy-img-box">🥛</div>
+      <div class="analogy-img-box">📰</div>
+      <div class="analogy-img-box">📱</div>
+    </div>
+    <ul class="analogy-lines">
+      <li>दूध रोज़ आता है।</li>
+      <li>अखबार हर दिन आता है।</li>
+      <li>ज़रूरत के हिसाब से खर्चा होता है।</li>
+    </ul>
+    <p class="analogy-question">तो घर का नेट क्यों नहीं?</p>
+  </section>
+
+  <!-- PROCESS -->
+  <section id="section-process" class="process-section" style="position:relative">
+    <h2>बुक करने के बाद क्या होता है?</h2>
+    <div class="process-steps">
+      <div class="process-step">
+        <div class="step-num">1</div>
+        <p class="step-text">हमारा टेक्निशियन 48–72 घंटे में आपके घर आकर नेट लगा देता है।</p>
+      </div>
+      <div class="process-step">
+        <div class="step-num">2</div>
+        <p class="step-text">Wiom ऐप से रिचार्ज करें, जितने दिन चाहें।</p>
+      </div>
+      <div class="process-step">
+        <div class="step-num">3</div>
+        <p class="step-text">जितने दिन रिचार्ज, उतने दिन नेट।</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section id="section-how" class="how-section" style="position:relative">
+    <h2>कैसे काम करता है?</h2>
+    <div class="how-cards">
+      <div class="how-card">
+        <div class="how-icon">📲</div>
+        <p>जब ज़रूरत हो — रिचार्ज करो।</p>
+      </div>
+      <div class="how-card">
+        <div class="how-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#d1007e" stroke-width="2"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1" fill="#d1007e" stroke="none"/></svg>
+        </div>
+        <p>जितने दिन का रिचार्ज —<br>उतने दिन नेट।</p>
+      </div>
+      <div class="how-card">
+        <div class="how-icon">✓</div>
+        <p>रिचार्ज नहीं — नेट बंद।<br>कोई झंझट नहीं।</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section id="section-pricing" class="pricing-section" style="position:relative">
+    <p class="pricing-lead">शुरू <strong>₹23</strong> से।</p>
+    <div class="price-cards">
+      <div class="price-card">
+        <div class="price-amount">₹23</div>
+        <div class="price-label">एक दिन का</div>
+      </div>
+      <div class="price-div">/</div>
+      <div class="price-card">
+        <div class="price-amount">₹565</div>
+        <div class="price-label">28 दिन का</div>
+      </div>
+    </div>
+    <p class="pricing-note">जितनी ज़रूरत, उतना रिचार्ज।</p>
+  </section>
+
+  <!-- CITIES -->
+  <section id="section-cities" class="cities-section" style="position:relative">
+    <h2>आपके शहर में Wiom</h2>
+    <p class="cities-list">Delhi · Noida · Ghaziabad · Meerut · Muzaffarnagar · Lucknow · Agra · Prayagraj · Mumbai · और भी शहरों में आ रहा है।</p>
+    <p class="cities-note">आपके एरिया में है या नहीं — ऊपर पिनकोड डालकर देखें</p>
+  </section>
+
+  <!-- FOOTER -->
+  <footer id="section-footer" class="site-footer" style="position:relative">
+    <div class="footer-brand">
+      <div class="footer-logo">
+        <svg viewBox="0 0 32 20" fill="none" width="24" height="24">
+          <path d="M4 10 C4 5, 10 2, 14 7 C16 10, 16 10, 18 7 C22 2, 28 5, 28 10 C28 15, 22 18, 18 13 C16 10, 16 10, 14 13 C10 18, 4 15, 4 10 Z" stroke="white" stroke-width="2.5" fill="none"/>
+        </svg>
+        Wiom
+      </div>
+      <div class="footer-tagline">रिचार्ज वाला घर का नेट</div>
+    </div>
+    <div class="footer-contact">
+      <div class="footer-phone">📞 सहायता: 88803 22222</div>
+      <div class="footer-address">Ground Floor, Plot 94, Sector 32,<br>Gurugram, Haryana 122001</div>
+    </div>
+  </footer>
+
+</div><!-- end #site-wrapper -->
+
+<script>
+// ─── DEFAULT ANNOTATIONS ───
+const DEFAULT_NOTES = [
+  {
+    id: 'n1',
+    sectionId: 'section-nav',
+    x: 60, y: 55,
+    severity: 'low',
+    ref: '§4 Memory Anchors',
+    body: 'Support number (88803 22222) appears at the very top — before the customer has understood the product. Signals "this is complicated" before the category frame has landed. §4 anchors should be first impression, not a support number.',
+    minimized: false
+  },
+  {
+    id: 'n2',
+    sectionId: 'section-pain',
+    x: 520, y: 30,
+    severity: 'critical',
+    ref: '§5 + Table 3 (CRITICAL)',
+    body: '"मोबाइल डेटा खत्म हो जाता है?" — frames Wiom as a mobile data replacement.\n\nTable 3 (CRITICAL): "Recharge-flexibility alone is exactly what mobile data offers — so leading on flexibility without the household anchor invites the most dangerous misunderstanding: is this a mobile-data product?"\n\n§5: "Remove \'ghar\' → it becomes mobile data."\n\nThis pain point seeds the wrong mental model before the household frame is established.',
+    minimized: false
+  },
+  {
+    id: 'n3',
+    sectionId: 'section-pain',
+    x: 520, y: 300,
+    severity: 'high',
+    ref: '§4 Memory Anchors',
+    body: '"जब नहीं, तो बंद।" — states internet-off without explaining instant resume.\n\nCall centre scripts correctly say "service pause hoti hai, dubara recharge par instantly chalu." Website says only "बंद." Customer with commitment anxiety reads this as a risk, not control.\n\n§4 anchor "Chale aapke hisaab se" requires the resume experience to be visible here.',
+    minimized: false
+  },
+  {
+    id: 'n4',
+    sectionId: 'section-analogy',
+    x: 520, y: 50,
+    severity: 'medium',
+    ref: '§7A Constraint-first creative',
+    body: 'Milk and newspaper arrive automatically every day without active choice. Wiom requires the customer to consciously recharge.\n\nRisk: customer builds a "it just runs" expectation from the analogy, then feels surprised when recharge expires. The analogy is correct for household-utility framing but wrong for active-recharge behaviour.',
+    minimized: false
+  },
+  {
+    id: 'n5',
+    sectionId: 'section-process',
+    x: 520, y: 30,
+    severity: 'high',
+    ref: '§11 Stage Table — Landing must re-anchor',
+    body: 'Step 1: "टेक्निशियन 48–72 घंटे में आपके घर आकर नेट लगा देता है।"\n\nThis is structurally identical to a broadband installation. Customer has just understood recharge-based flexibility — then immediately hits a technician-visit wait. No framing that this is a one-time setup after which everything is on their terms.\n\n§11: "Landing must aggressively re-anchor into RWGKN." Step 1 does the opposite.',
+    minimized: false
+  },
+  {
+    id: 'n6',
+    sectionId: 'section-process',
+    x: 520, y: 200,
+    severity: 'medium',
+    ref: '§7E Household framing',
+    body: 'Steps 2 and 3 make no mention of the household / multiple-device dimension. "Wiom ऐप से रिचार्ज करें" is presented as a personal action.\n\nCall centre scripts lead with "8-12 devices aaraam se chal sakte hain." The household promise is built in the hero but not reinforced in the process section.\n\n§7E: "Always anchor to the whole home."',
+    minimized: false
+  },
+  {
+    id: 'n7',
+    sectionId: 'section-how',
+    x: 520, y: 50,
+    severity: 'high',
+    ref: '§4 "Chale aapke hisaab se"',
+    body: '"रिचार्ज नहीं — नेट बंद। कोई झंझट नहीं।"\n\nThird card presents disconnection as the feature ("no hassle") rather than control ("you decide"). The pause/resume symmetry is incomplete — the card shows what happens when you stop but not what happens when you restart.\n\nMissing: "Dubara recharge — instantly on." The control promise is half-stated.',
+    minimized: false
+  },
+  {
+    id: 'n8',
+    sectionId: 'section-pricing',
+    x: 60, y: 30,
+    severity: 'high',
+    ref: '§2 Primary Operating Principle',
+    body: '"₹565 / 28 दिन का" — showing the 28-day price card invites direct comparison with monthly broadband (Jio Fiber ₹399, Airtel ₹499). The page gives the customer no framework to reject that comparison.\n\n§2: "Not allowed: any framing that asks the user to compare us to Jio/Airtel on their terms."\n\nMissing: the value maths. If you use 15 days, you pay ~₹345. That argument needs to be on the page.',
+    minimized: false
+  },
+  {
+    id: 'n9',
+    sectionId: 'section-pricing',
+    x: 60, y: 220,
+    severity: 'high',
+    ref: '§4 + §3 User is the hero',
+    body: 'CTA sends user to booking but ₹100 booking fee and ₹300 security deposit are not mentioned anywhere on the page.\n\nHidden financial commitment at conversion contradicts "Chale aapke hisaab se." A customer surprised by fees at checkout will update their mental model: "this isn\'t as on-demand as they said."\n\n§3: "User stays the hero; Wiom enters only as the resolution." Surprise fees make Wiom the obstacle.',
+    minimized: false
+  },
+  {
+    id: 'n10',
+    sectionId: 'section-cities',
+    x: 520, y: 50,
+    severity: 'low',
+    ref: '§1 Objective',
+    body: '"और भी शहरों में आ रहा है" signals early-stage scale. Minor trust signal for new customers evaluating whether to commit ₹100.',
+    minimized: false
+  },
+  {
+    id: 'n11',
+    sectionId: 'section-hero',
+    x: 520, y: 30,
+    severity: 'ok',
+    ref: '§4 + §5',
+    body: '✓ Hero headline is clean. "रिचार्ज वाला / घर का नेट" — both halves present and co-equal. §5: "Both parts co-equal." "जितने दिन रिचार्ज, उतने दिन नेट" is the operating rule from §4. No WiFi, no broadband language.',
+    minimized: false
+  },
+  {
+    id: 'n12',
+    sectionId: 'section-footer',
+    x: 60, y: 50,
+    severity: 'ok',
+    ref: '§4 Memory Anchors',
+    body: '✓ Footer repeats "रिचार्ज वाला घर का नेट" — category label reinforced at page end. Good.',
+    minimized: false
+  }
+];
+
+// ─── STATE ───
+let notesVisible = true;
+let pendingNotePos = null;
+
+function loadNotes() {
+  const saved = localStorage.getItem('wiom_review_notes');
+  if (saved) {
+    try { return JSON.parse(saved); }
+    catch(e) {}
+  }
+  return JSON.parse(JSON.stringify(DEFAULT_NOTES));
+}
+
+function saveNotes(notes) {
+  localStorage.setItem('wiom_review_notes', JSON.stringify(notes));
+  updateCount(notes);
+}
+
+function updateCount(notes) {
+  const el = document.getElementById('note-count');
+  if (el) el.textContent = `${notes.length} note${notes.length !== 1 ? 's' : ''}`;
+}
+
+// ─── RENDER NOTES ───
+function renderNotes() {
+  document.querySelectorAll('.annotation-note').forEach(el => el.remove());
+  const notes = loadNotes();
+  notes.forEach(note => renderNote(note, notes));
+  updateCount(notes);
+}
+
+function renderNote(note, allNotes) {
+  const section = document.getElementById(note.sectionId);
+  if (!section) return;
+
+  const el = document.createElement('div');
+  el.className = `annotation-note sev-${note.severity}${note.minimized ? ' minimized' : ''}${!notesVisible ? ' hidden-note' : ''}`;
+  el.id = `note-${note.id}`;
+  el.style.left = note.x + 'px';
+  el.style.top = note.y + 'px';
+
+  el.innerHTML = `
+    <div class="note-header" onmousedown="startDrag(event, '${note.id}')">
+      <span class="note-severity">${note.severity.toUpperCase()}</span>
+      <span class="note-ref">${escHtml(note.ref)}</span>
+      <div class="note-actions">
+        <button class="note-btn" title="${note.minimized ? 'Expand' : 'Minimise'}" onclick="toggleMinimize('${note.id}')">${note.minimized ? '▲' : '▼'}</button>
+        <button class="note-btn" title="Delete" onclick="deleteNote('${note.id}')" style="color:#ef4444">✕</button>
+      </div>
+    </div>
+    <div class="note-body-wrap">
+      <textarea class="note-body" placeholder="Edit note..." onchange="updateNoteBody('${note.id}', this.value)">${escHtml(note.body)}</textarea>
+    </div>
+  `;
+
+  section.appendChild(el);
+}
+
+function escHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ─── DRAG ───
+let dragState = null;
+
+function startDrag(e, noteId) {
+  if (e.target.tagName === 'BUTTON' || e.target.tagName === 'TEXTAREA') return;
+  e.preventDefault();
+  const el = document.getElementById(`note-${noteId}`);
+  const rect = el.getBoundingClientRect();
+  dragState = {
+    noteId,
+    el,
+    startX: e.clientX - rect.left,
+    startY: e.clientY - rect.top
+  };
+}
+
+document.addEventListener('mousemove', e => {
+  if (!dragState) return;
+  const section = dragState.el.parentElement;
+  const secRect = section.getBoundingClientRect();
+  const x = e.clientX - secRect.left - dragState.startX;
+  const y = e.clientY - secRect.top - dragState.startY;
+  dragState.el.style.left = x + 'px';
+  dragState.el.style.top = y + 'px';
+});
+
+document.addEventListener('mouseup', () => {
+  if (!dragState) return;
+  const el = dragState.el;
+  const notes = loadNotes();
+  const note = notes.find(n => n.id === dragState.noteId);
+  if (note) {
+    note.x = parseInt(el.style.left);
+    note.y = parseInt(el.style.top);
+    saveNotes(notes);
+  }
+  dragState = null;
+});
+
+// ─── NOTE ACTIONS ───
+function toggleMinimize(noteId) {
+  const notes = loadNotes();
+  const note = notes.find(n => n.id === noteId);
+  if (note) {
+    note.minimized = !note.minimized;
+    saveNotes(notes);
+    renderNotes();
+  }
+}
+
+function deleteNote(noteId) {
+  if (!confirm('Delete this note?')) return;
+  const notes = loadNotes().filter(n => n.id !== noteId);
+  saveNotes(notes);
+  document.getElementById(`note-${noteId}`)?.remove();
+  updateCount(notes);
+}
+
+function updateNoteBody(noteId, value) {
+  const notes = loadNotes();
+  const note = notes.find(n => n.id === noteId);
+  if (note) { note.body = value; saveNotes(notes); }
+}
+
+// ─── TOGGLE VISIBILITY ───
+function toggleNotes() {
+  notesVisible = !notesVisible;
+  const btn = document.getElementById('btn-toggle-notes');
+  btn.textContent = notesVisible ? 'Hide Notes' : 'Show Notes';
+  btn.classList.toggle('active', notesVisible);
+  document.querySelectorAll('.annotation-note').forEach(el => {
+    el.classList.toggle('hidden-note', !notesVisible);
+  });
+}
+
+// ─── ADD NOTE MODAL ───
+function openAddModal() {
+  document.getElementById('add-note-modal').style.display = 'block';
+  document.getElementById('modal-overlay').style.display = 'block';
+  document.getElementById('modal-body').value = '';
+  document.getElementById('modal-ref').value = '';
+}
+
+function closeAddModal() {
+  document.getElementById('add-note-modal').style.display = 'none';
+  document.getElementById('modal-overlay').style.display = 'none';
+}
+
+function saveNewNote() {
+  const severity = document.getElementById('modal-severity').value;
+  const ref = document.getElementById('modal-ref').value.trim() || '—';
+  const body = document.getElementById('modal-body').value.trim();
+  if (!body) return alert('Please write a note.');
+
+  const notes = loadNotes();
+  const newNote = {
+    id: 'n' + Date.now(),
+    sectionId: 'section-hero',
+    x: 60, y: 60,
+    severity, ref, body,
+    minimized: false
+  };
+  notes.push(newNote);
+  saveNotes(notes);
+  renderNote(newNote, notes);
+  closeAddModal();
+}
+
+// ─── EXPORT / IMPORT ───
+function exportNotes() {
+  const notes = loadNotes();
+  const blob = new Blob([JSON.stringify(notes, null, 2)], {type: 'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'wiom-review-notes.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function triggerImport() {
+  document.getElementById('import-file').click();
+}
+
+function importNotes(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const notes = JSON.parse(ev.target.result);
+      saveNotes(notes);
+      renderNotes();
+    } catch(err) {
+      alert('Invalid JSON file.');
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
+
+function resetNotes() {
+  if (!confirm('Reset all notes to default? This will discard your edits.')) return;
+  localStorage.removeItem('wiom_review_notes');
+  renderNotes();
+}
+
+// ─── INIT ───
+document.addEventListener('DOMContentLoaded', () => {
+  renderNotes();
+});
+</script>
+
+</body>
+</html>
