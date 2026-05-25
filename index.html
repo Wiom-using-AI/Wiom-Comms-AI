@@ -1000,8 +1000,18 @@ let pendingNotePos = null;
 function loadNotes() {
   const saved = localStorage.getItem('wiom_review_notes');
   if (saved) {
-    try { return JSON.parse(saved); }
-    catch(e) {}
+    try {
+      const parsed = JSON.parse(saved);
+      // Merge in any default notes whose IDs are not in the saved set
+      const savedIds = new Set(parsed.map(n => n.id));
+      const missing = DEFAULT_NOTES.filter(n => !savedIds.has(n.id));
+      if (missing.length > 0) {
+        const merged = [...parsed, ...missing];
+        saveNotes(merged);
+        return merged;
+      }
+      return parsed;
+    } catch(e) {}
   }
   return JSON.parse(JSON.stringify(DEFAULT_NOTES));
 }
