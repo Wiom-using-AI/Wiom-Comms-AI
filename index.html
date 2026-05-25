@@ -817,7 +817,7 @@
 
 <script>
 // ─── DEFAULT ANNOTATIONS ───
-const DEFAULT_NOTES = [
+const DEFAULT_NOTES = [ // v3
   {
     id: 'n1',
     sectionId: 'section-nav',
@@ -917,6 +917,15 @@ const DEFAULT_NOTES = [
     body: 'Not the right logo',
     minimized: false
   },
+  {
+    id: 'n1779695828494',
+    sectionId: 'section-hero',
+    x: 351, y: 112,
+    severity: 'high',
+    ref: '—',
+    body: 'English experience is awkward and not well-built out.',
+    minimized: false
+  },
 
   // ── PLAY STORE NOTES ──
   {
@@ -931,7 +940,7 @@ const DEFAULT_NOTES = [
   {
     id: 'ps2',
     sectionId: 'ps-description',
-    x: 520, y: 40,
+    x: 437, y: 27,
     severity: 'critical',
     ref: '§5 — Remove ghar → mobile data',
     body: 'The description body never says "ghar" or "घर" again after the title.\n\n§5: "Remove \'ghar\' → it becomes mobile data." The description explains the recharge mechanic correctly but strips out the household identity. A customer reading only the description body (not the title) gets the operating rule with no category frame.\n\nThis is the most dangerous form — technically accurate, category-free.',
@@ -958,7 +967,7 @@ const DEFAULT_NOTES = [
   {
     id: 'ps5',
     sectionId: 'ps-description',
-    x: 60, y: 300,
+    x: 224, y: 174,
     severity: 'high',
     ref: '§4 — Chale aapke hisaab se',
     body: '"रिचार्ज नहीं, तो नेट बंद" / "No recharge means the Net stops" — same flag as the website.\n\nThe description ends on disconnection, not control. Three bullets describe the mechanic but there is no fourth: "Recharge again — instantly back on."\n\nThe pause/resume symmetry is half-stated. §4 "Chale aapke hisaab se" requires the resume experience to be visible, not just the stop.',
@@ -967,7 +976,7 @@ const DEFAULT_NOTES = [
   {
     id: 'ps6',
     sectionId: 'ps-description',
-    x: 60, y: 500,
+    x: 540, y: 594,
     severity: 'high',
     ref: '§11 Stage Table — Landing must re-anchor',
     body: 'This is the highest-intent landing moment in the customer journey. Someone has searched, found Wiom, and is deciding whether to install.\n\n§11: "Landing must aggressively re-anchor into RWGKN — ghar + recharge-shape, above the fold."\n\nInstead the description gives the recharge mechanic and then says Wiom isn\'t available everywhere. The category job — teaching why this is different and better for a household — is not being done at the moment it matters most.',
@@ -988,7 +997,7 @@ const DEFAULT_NOTES = [
     x: 520, y: 260,
     severity: 'high',
     ref: 'Experiential contamination — social proof',
-    body: '"The call center people do not help at all. They just keep saying that it should be done through the app."\n\nA prospective customer reading this before installing learns: Wiom is difficult to use, support doesn\'t resolve anything, go figure it out yourself.\n\nThis is experiential contamination arriving as social proof — the most credible contamination vector because it comes from another customer, not from Wiom. The "control" promise is directly contradicted by the visible review.',
+    body: 'Reviews contaminate through social proof — wrong language or bad experience in a review lands harder than wrong language in copy, because it comes from someone who isn\'t Wiom.',
     minimized: false
   }
 ];
