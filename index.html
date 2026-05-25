@@ -722,10 +722,10 @@ const DEFAULT_NOTES = [
   {
     id: 'n1',
     sectionId: 'section-nav',
-    x: 60, y: 55,
+    x: 1013, y: 14,
     severity: 'low',
     ref: '§4 Memory Anchors',
-    body: 'Support number (88803 22222) appears at the very top — before the customer has understood the product. Signals "this is complicated" before the category frame has landed. §4 anchors should be first impression, not a support number.',
+    body: 'Support number (88803 22222) appears at the very top and is repeated at the bottom — before the customer has understood the product. Signals "this is complicated" before the category frame has landed. §4 anchors should be first impression, not a support number.',
     minimized: false
   },
   {
@@ -734,7 +734,7 @@ const DEFAULT_NOTES = [
     x: 520, y: 30,
     severity: 'critical',
     ref: '§5 + Table 3 (CRITICAL)',
-    body: '"मोबाइल डेटा खत्म हो जाता है?" — frames Wiom as a mobile data replacement.\n\nTable 3 (CRITICAL): "Recharge-flexibility alone is exactly what mobile data offers — so leading on flexibility without the household anchor invites the most dangerous misunderstanding: is this a mobile-data product?"\n\n§5: "Remove \'ghar\' → it becomes mobile data."\n\nThis pain point seeds the wrong mental model before the household frame is established.',
+    body: 'Mobile data framing without household mention - \n\n"मोबाइल डेटा खत्म हो जाता है?" — frames Wiom as a mobile data replacement.\n\nTable 3 (CRITICAL): "Recharge-flexibility alone is exactly what mobile data offers — so leading on flexibility without the household anchor invites the most dangerous misunderstanding: is this a mobile-data product?"\n\n§5: "Remove \'ghar\' → it becomes mobile data."\n\nThis pain point seeds the wrong mental model before the household frame is established.',
     minimized: false
   },
   {
@@ -749,16 +749,16 @@ const DEFAULT_NOTES = [
   {
     id: 'n4',
     sectionId: 'section-analogy',
-    x: 520, y: 50,
+    x: 400, y: 267,
     severity: 'medium',
     ref: '§7A Constraint-first creative',
-    body: 'Milk and newspaper arrive automatically every day without active choice. Wiom requires the customer to consciously recharge.\n\nRisk: customer builds a "it just runs" expectation from the analogy, then feels surprised when recharge expires. The analogy is correct for household-utility framing but wrong for active-recharge behaviour.',
+    body: 'The analogy correctly establishes Wiom as a household utility — the right category frame. But milk and newspaper imply automatic continuity: they keep coming until you stop them. Wiom works the opposite way. It runs only when you recharge, and stops when you don\'t.\n\nA closer version of the analogy already exists within it: when you\'re travelling, the newspaper doesn\'t come to your empty house. That\'s the behaviour Wiom actually wants to teach — continuity is your choice, not a default. The analogy should lean into that detail rather than the daily-arrival framing, which implies the net will just keep running without the customer doing anything.',
     minimized: false
   },
   {
     id: 'n5',
     sectionId: 'section-process',
-    x: 520, y: 30,
+    x: 525, y: 46,
     severity: 'high',
     ref: '§11 Stage Table — Landing must re-anchor',
     body: 'Step 1: "टेक्निशियन 48–72 घंटे में आपके घर आकर नेट लगा देता है।"\n\nThis is structurally identical to a broadband installation. Customer has just understood recharge-based flexibility — then immediately hits a technician-visit wait. No framing that this is a one-time setup after which everything is on their terms.\n\n§11: "Landing must aggressively re-anchor into RWGKN." Step 1 does the opposite.',
@@ -767,7 +767,7 @@ const DEFAULT_NOTES = [
   {
     id: 'n6',
     sectionId: 'section-process',
-    x: 520, y: 200,
+    x: 526, y: 240,
     severity: 'medium',
     ref: '§7E Household framing',
     body: 'Steps 2 and 3 make no mention of the household / multiple-device dimension. "Wiom ऐप से रिचार्ज करें" is presented as a personal action.\n\nCall centre scripts lead with "8-12 devices aaraam se chal sakte hain." The household promise is built in the hero but not reinforced in the process section.\n\n§7E: "Always anchor to the whole home."',
@@ -776,7 +776,7 @@ const DEFAULT_NOTES = [
   {
     id: 'n7',
     sectionId: 'section-how',
-    x: 520, y: 50,
+    x: 1022, y: 49,
     severity: 'high',
     ref: '§4 "Chale aapke hisaab se"',
     body: '"रिचार्ज नहीं — नेट बंद। कोई झंझट नहीं।"\n\nThird card presents disconnection as the feature ("no hassle") rather than control ("you decide"). The pause/resume symmetry is incomplete — the card shows what happens when you stop but not what happens when you restart.\n\nMissing: "Dubara recharge — instantly on." The control promise is half-stated.',
@@ -785,25 +785,16 @@ const DEFAULT_NOTES = [
   {
     id: 'n8',
     sectionId: 'section-pricing',
-    x: 60, y: 30,
+    x: 927, y: 133,
     severity: 'high',
     ref: '§2 Primary Operating Principle',
     body: '"₹565 / 28 दिन का" — showing the 28-day price card invites direct comparison with monthly broadband (Jio Fiber ₹399, Airtel ₹499). The page gives the customer no framework to reject that comparison.\n\n§2: "Not allowed: any framing that asks the user to compare us to Jio/Airtel on their terms."\n\nMissing: the value maths. If you use 15 days, you pay ~₹345. That argument needs to be on the page.',
     minimized: false
   },
   {
-    id: 'n9',
-    sectionId: 'section-pricing',
-    x: 60, y: 220,
-    severity: 'high',
-    ref: '§4 + §3 User is the hero',
-    body: 'CTA sends user to booking but ₹100 booking fee and ₹300 security deposit are not mentioned anywhere on the page.\n\nHidden financial commitment at conversion contradicts "Chale aapke hisaab se." A customer surprised by fees at checkout will update their mental model: "this isn\'t as on-demand as they said."\n\n§3: "User stays the hero; Wiom enters only as the resolution." Surprise fees make Wiom the obstacle.',
-    minimized: false
-  },
-  {
     id: 'n10',
     sectionId: 'section-cities',
-    x: 520, y: 50,
+    x: 595, y: 219,
     severity: 'low',
     ref: '§1 Objective',
     body: '"और भी शहरों में आ रहा है" signals early-stage scale. Minor trust signal for new customers evaluating whether to commit ₹100.',
@@ -819,12 +810,12 @@ const DEFAULT_NOTES = [
     minimized: false
   },
   {
-    id: 'n12',
-    sectionId: 'section-footer',
-    x: 60, y: 50,
-    severity: 'ok',
-    ref: '§4 Memory Anchors',
-    body: '✓ Footer repeats "रिचार्ज वाला घर का नेट" — category label reinforced at page end. Good.',
+    id: 'n1779694776154',
+    sectionId: 'section-hero',
+    x: 844, y: 2887,
+    severity: 'high',
+    ref: '—',
+    body: 'Not the right logo',
     minimized: false
   }
 ];
